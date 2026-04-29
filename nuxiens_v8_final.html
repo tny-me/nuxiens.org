@@ -1,0 +1,445 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FAFAFA;--surface:#FFFFFF;--border:#E5E5E5;
+  --text:#111111;--text2:#555555;--text3:#999999;
+  --accent:#B31B1B;--accent-light:#FFF5F5;
+  --nav:#111111;--nav-sub:rgba(255,255,255,.45);
+  --font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+[data-dark="1"]{
+  --bg:#111111;--surface:#1A1A1A;--border:#2A2A2A;
+  --text:#EEEEEE;--text2:#999999;--text3:#555555;
+  --accent:#E05252;--accent-light:#2A1515;
+  --nav:#000000;
+}
+.nx{background:var(--bg);font-family:var(--font);color:var(--text);transition:background .2s,color .2s}
+
+.nx-nav{background:var(--nav);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:48px;gap:12px}
+.nx-logo{display:flex;align-items:center;gap:9px;cursor:pointer;flex-shrink:0}
+.nx-logo-box{width:26px;height:26px;border-radius:4px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nx-logo-n{font-size:13px;font-weight:500;color:#fff;font-family:var(--mono)}
+.nx-logo-name{font-size:14px;font-weight:500;color:#fff;letter-spacing:-.2px}
+.nx-logo-sep{color:var(--nav-sub);margin:0 2px}
+.nx-logo-url{font-family:var(--mono);font-size:10px;color:var(--nav-sub)}
+.nx-nav-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.nx-nav-btn{font-family:var(--mono);font-size:10px;padding:5px 11px;border:1px solid rgba(255,255,255,.18);border-radius:4px;background:none;cursor:pointer;color:rgba(255,255,255,.65);transition:all .15s;white-space:nowrap;letter-spacing:.2px}
+.nx-nav-btn:hover{border-color:rgba(255,255,255,.5);color:#fff;background:rgba(255,255,255,.07)}
+.nx-nav-donate{background:var(--accent);border-color:var(--accent);color:#fff}
+.nx-nav-donate:hover{background:#991515;border-color:#991515;color:#fff}
+.nx-lang-btn{font-family:var(--mono);font-size:10px;padding:5px 10px;border:1px solid rgba(255,255,255,.18);border-radius:4px;background:none;cursor:pointer;color:rgba(255,255,255,.65);transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.nx-lang-btn:hover{border-color:rgba(255,255,255,.5);color:#fff;background:rgba(255,255,255,.07)}
+.nx-lang-btn.active{border-color:var(--accent);color:#fff;background:rgba(179,27,27,.25)}
+.nx-lang-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);display:inline-block;flex-shrink:0}
+.nx-dark-btn{width:28px;height:28px;border:1px solid rgba(255,255,255,.18);border-radius:4px;background:none;cursor:pointer;color:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s}
+.nx-dark-btn:hover{border-color:rgba(255,255,255,.5);color:#fff}
+
+.nx-subbar{background:var(--nav);border-top:1px solid rgba(255,255,255,.07);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:36px}
+.nx-tabs{display:flex}
+.nx-tab{font-family:var(--mono);font-size:10px;letter-spacing:.6px;text-transform:uppercase;padding:0 14px;cursor:pointer;border:none;background:none;color:var(--nav-sub);transition:all .15s;height:36px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.nx-tab:hover{color:rgba(255,255,255,.8)}
+.nx-tab.on{color:#fff;border-bottom-color:var(--accent)}
+.nx-status-bar{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:9px;color:var(--nav-sub);letter-spacing:.3px}
+.nx-pulse{width:4px;height:4px;border-radius:50%;background:#22C55E;animation:blink 2s infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.nx-spin{display:inline-block;width:8px;height:8px;border:1.5px solid rgba(255,255,255,.2);border-top-color:rgba(255,255,255,.8);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.nx-trans-badge{display:flex;align-items:center;gap:5px;color:rgba(255,255,255,.5)}
+
+.nx-filter-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:9px 20px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.nx-filter-label{font-family:var(--mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-right:2px;flex-shrink:0}
+.nx-filter-chip{font-family:var(--mono);font-size:10px;padding:3px 9px;border:1px solid var(--border);border-radius:3px;background:none;cursor:pointer;color:var(--text2);transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.nx-filter-chip:hover{border-color:var(--text2);color:var(--text)}
+.nx-filter-chip.on{color:#fff;border-color:transparent}
+.nx-chip-count{font-size:9px;opacity:.55}
+.nx-filter-clear{font-family:var(--mono);font-size:9px;color:var(--text3);background:none;border:none;cursor:pointer;padding:3px 6px;margin-left:auto;transition:color .15s}
+.nx-filter-clear:hover{color:var(--accent)}
+.nx-filter-result{font-family:var(--mono);font-size:9px;color:var(--text3)}
+
+.nx-about{background:var(--surface);border-bottom:2px solid var(--border);padding:16px 20px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.nx-about-text{font-size:13px;color:var(--text2);line-height:1.65;max-width:540px}
+.nx-about-text strong{color:var(--text);font-weight:500}
+.nx-about-cta{font-family:var(--mono);font-size:10px;padding:6px 12px;border:1px solid var(--accent);border-radius:3px;background:none;cursor:pointer;color:var(--accent);transition:all .15s;white-space:nowrap;flex-shrink:0}
+.nx-about-cta:hover{background:var(--accent);color:#fff}
+
+.nx-list{list-style:none;border-top:1px solid var(--border)}
+.nx-item{display:grid;grid-template-columns:44px 28px 1fr;border-bottom:1px solid var(--border);padding:10px 20px 10px 0;transition:background .1s;position:relative}
+.nx-item:hover{background:var(--surface)}
+.nx-item.isnew{background:var(--accent-light)}
+.nx-rank{font-family:var(--mono);font-size:12px;color:var(--text3);text-align:right;padding:2px 12px 0 20px;line-height:1}
+.nx-vote-col{display:flex;flex-direction:column;align-items:center;gap:2px;padding-top:1px}
+.nx-arr{font-size:11px;cursor:pointer;border:none;background:none;color:var(--text3);padding:1px 5px;line-height:1;transition:all .12s;border-radius:3px}
+.nx-arr:hover,.nx-arr.v{color:var(--accent);background:var(--accent-light)}
+.nx-pts{font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1;text-align:center}
+.nx-pts.v{color:var(--accent)}
+.nx-body-col{min-width:0;padding-left:6px}
+.nx-title-row{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.nx-ttl{font-size:14px;font-weight:400;color:var(--text);text-decoration:none;line-height:1.5}
+.nx-ttl:hover{color:var(--accent)}
+.nx-ttl-translated{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.45;font-style:italic;display:block}
+.nx-domain{font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--bg);border:1px solid var(--border);padding:1px 6px;border-radius:3px;white-space:nowrap;flex-shrink:0}
+.nx-new-chip{font-family:var(--mono);font-size:9px;background:var(--accent);color:#fff;padding:1px 6px;border-radius:3px;flex-shrink:0}
+.nx-tag{font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;flex-shrink:0;cursor:pointer;border:1px solid transparent;transition:opacity .12s}
+.nx-tag:hover{opacity:.7}
+.nx-meta{font-family:var(--mono);font-size:10px;color:var(--text3);display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:4px}
+.nx-meta-sep{opacity:.3}
+.nx-meta-pts{color:var(--accent)}
+.nx-comments{color:var(--text3);text-decoration:none;transition:color .12s}
+.nx-comments:hover{color:var(--accent)}
+
+.nx-more-wrap{padding:16px 20px;text-align:center;border-bottom:1px solid var(--border);background:var(--surface)}
+.nx-more-btn{font-family:var(--mono);font-size:11px;padding:8px 24px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;color:var(--text2);transition:all .15s;letter-spacing:.3px}
+.nx-more-btn:hover{border-color:var(--accent);color:var(--accent)}
+.nx-more-btn:disabled{opacity:.4;cursor:not-allowed}
+.nx-more-info{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:6px}
+
+.nx-sk{animation:sh 1.3s ease-in-out infinite}
+@keyframes sh{0%,100%{opacity:.25}50%{opacity:.65}}
+.nx-skb{background:var(--border);border-radius:2px}
+
+.nx-empty{padding:36px 20px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--text3)}
+.nx-foot{background:var(--nav);border-top:1px solid rgba(255,255,255,.07);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.nx-foot-txt{font-family:var(--mono);font-size:9px;color:var(--nav-sub);letter-spacing:.3px}
+</style>
+
+<div class="nx" id="nxroot"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+const {useState,useEffect,useRef,useCallback,useMemo}=React;
+const h=React.createElement;
+const BASE='https://hacker-news.firebaseio.com/v0';
+const TABS=[{id:'top',label:'top'},{id:'new',label:'new'}];
+const EP={top:'topstories',new:'newstories'};
+const PAGE=30;
+
+const LANGS=[
+  {id:'en',label:'EN'},
+  {id:'es',label:'ES'},
+  {id:'fr',label:'FR'},
+  {id:'de',label:'DE'},
+  {id:'pt',label:'PT'},
+  {id:'zh',label:'ZH'},
+  {id:'ja',label:'JA'},
+];
+
+const LANG_NAMES={en:'English',es:'español',fr:'français',de:'Deutsch',pt:'português',zh:'中文',ja:'日本語'};
+
+const TAGS=[
+  {tag:'AI',color:'#7C3AED',bg:'#F5F3FF',dbg:'#2D1B69',kw:['ai','artificial intelligence','gpt','llm','machine learning','ml','openai','claude','gemini','mistral','anthropic','deepmind','neural','diffusion','transformer','chatbot','copilot','inference','training','deep learning','language model']},
+  {tag:'security',color:'#DC2626',bg:'#FEF2F2',dbg:'#450A0A',kw:['security','vulnerability','exploit','breach','hack','malware','ransomware','phishing','cve','zero-day','encryption','privacy','surveillance','leak','attack','threat','backdoor','bug bounty']},
+  {tag:'code',color:'#0369A1',bg:'#F0F9FF',dbg:'#0C1A2E',kw:['rust','python','javascript','typescript','golang','java','c++','compiler','framework','library','open source','github','npm','package','api','sdk','cli','linux','kernel','programming','software']},
+  {tag:'startup',color:'#B45309',bg:'#FFFBEB',dbg:'#271A00',kw:['startup','funding','vc','venture','series a','series b','valuation','acquisition','ipo','founder','yc','y combinator','raise','unicorn','seed round']},
+  {tag:'web',color:'#0F766E',bg:'#F0FDFA',dbg:'#0A2926',kw:['browser','chrome','firefox','html','css','react','vue','nextjs','wasm','http','frontend','backend','cloudflare','vercel','cdn','web','svelte','astro']},
+  {tag:'hardware',color:'#6D28D9',bg:'#FAF5FF',dbg:'#1E0A3C',kw:['chip','cpu','gpu','nvidia','amd','intel','apple silicon','arm','quantum','robot','drone','hardware','semiconductor','tsmc','memory','storage']},
+  {tag:'science',color:'#15803D',bg:'#F0FDF4',dbg:'#0A2018',kw:['research','study','paper','science','physics','biology','chemistry','space','nasa','climate','energy','medicine','health','gene','protein','experiment','discovery']},
+  {tag:'business',color:'#1D4ED8',bg:'#EFF6FF',dbg:'#0A1628',kw:['google','apple','meta','microsoft','amazon','tesla','twitter','tiktok','netflix','layoff','employee','ceo','revenue','profit','market','stock','antitrust','regulation']},
+  {tag:'crypto',color:'#D97706',bg:'#FFFBEB',dbg:'#2A1A00',kw:['bitcoin','ethereum','crypto','blockchain','defi','nft','web3','solana','coinbase','token','wallet','mining']},
+];
+
+function getTags(title){
+  if(!title)return[];
+  const low=title.toLowerCase();
+  return TAGS.filter(r=>r.kw.some(k=>low.includes(k))).map(r=>r.tag);
+}
+function ago(ts){const s=Math.floor(Date.now()/1000-ts);if(s<60)return s+'s';if(s<3600)return Math.floor(s/60)+'m';if(s<86400)return Math.floor(s/3600)+'h';return Math.floor(s/86400)+'d';}
+function dom(url){if(!url)return null;try{return new URL(url).hostname.replace(/^www\./,'');}catch{return null;}}
+function fmtCd(s){return s>=60?`${Math.floor(s/60)}m ${s%60}s`:`${s}s`;}
+
+async function translateBatch(titles,lang){
+  if(lang==='en')return titles;
+  const langName=LANG_NAMES[lang]||lang;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,
+        messages:[{role:'user',content:`Translate these news headlines to ${langName}. Rules: 1) Do NOT translate proper nouns, product names, company names or brands. 2) Return ONLY a valid JSON array with exactly ${titles.length} strings. No backticks, no extra text.\n${JSON.stringify(titles)}`}]
+      })
+    });
+    const d=await res.json();
+    if(d.error)return null;
+    const txt=d.content[0].text.trim().replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(txt);
+    if(Array.isArray(parsed)&&parsed.length===titles.length)return parsed;
+  }catch(e){}
+  return null;
+}
+
+function TagPill({tag,active,onClick,dark}){
+  const r=TAGS.find(t=>t.tag===tag);
+  if(!r)return null;
+  const bg=active?r.color:(dark?r.dbg:r.bg);
+  const color=active?'#fff':r.color;
+  const border=active?r.color:r.color+'44';
+  return h('span',{className:'nx-tag',style:{background:bg,color,borderColor:border},
+    onClick:onClick?e=>{e.stopPropagation();onClick(tag);}:undefined},tag);
+}
+
+function Row({item,rank,isNew,translation,onTagClick,dark}){
+  const[pts,setPts]=useState(item.score||0);
+  const[voted,setVoted]=useState(false);
+  const d=dom(item.url);
+  const tags=useMemo(()=>getTags(item.title),[item.title]);
+  const commentsUrl=`https://news.ycombinator.com/item?id=${item.id}`;
+  return h('li',{className:`nx-item${isNew?' isnew':''}`},
+    h('div',{className:'nx-rank'},rank),
+    h('div',{className:'nx-vote-col'},
+      h('button',{className:`nx-arr${voted?' v':''}`,onClick:()=>{if(!voted){setPts(p=>p+1);setVoted(true);}}},'▲'),
+      h('span',{className:`nx-pts${voted?' v':''}`},pts)
+    ),
+    h('div',{className:'nx-body-col'},
+      h('div',{className:'nx-title-row'},
+        h('a',{className:'nx-ttl',href:item.url||commentsUrl,target:'_blank',rel:'noopener'},item.title),
+        d&&h('span',{className:'nx-domain'},d),
+        isNew&&h('span',{className:'nx-new-chip'},'new'),
+        ...tags.map(t=>h(TagPill,{key:t,tag:t,active:false,onClick:onTagClick,dark}))
+      ),
+      translation&&h('span',{className:'nx-ttl-translated'},translation),
+      h('div',{className:'nx-meta'},
+        h('span',{className:'nx-meta-pts'},pts+' pts'),
+        h('span',{className:'nx-meta-sep'},'·'),
+        h('span',null,item.by),
+        h('span',{className:'nx-meta-sep'},'·'),
+        h('span',null,ago(item.time)),
+        item.descendants>0&&[
+          h('span',{key:'sep',className:'nx-meta-sep'},'·'),
+          h('a',{key:'c',className:'nx-comments',href:commentsUrl,target:'_blank',rel:'noopener'},item.descendants+' comments')
+        ]
+      )
+    )
+  );
+}
+
+function App(){
+  const[tab,setTab]=useState('top');
+  const[allIds,setAllIds]=useState([]);
+  const[items,setItems]=useState([]);
+  const[trans,setTrans]=useState({});
+  const[loading,setLoading]=useState(true);
+  const[loadingMore,setLoadingMore]=useState(false);
+  const[translating,setTranslating]=useState(false);
+  const[page,setPage]=useState(1);
+  const[newIds,setNewIds]=useState(new Set());
+  const[lastIds,setLastIds]=useState(new Set());
+  const[cd,setCd]=useState(60);
+  const[about,setAbout]=useState(false);
+  const[dark,setDark]=useState(false);
+  const[lang,setLang]=useState('en');
+  const[showLangs,setShowLangs]=useState(false);
+  const[activeFilters,setActiveFilters]=useState(new Set());
+  const t1=useRef(),t2=useRef();
+  const langRef=useRef();
+
+  useEffect(()=>{
+    function handler(e){if(langRef.current&&!langRef.current.contains(e.target))setShowLangs(false);}
+    document.addEventListener('mousedown',handler);
+    return()=>document.removeEventListener('mousedown',handler);
+  },[]);
+
+  const fetchIds=useCallback(async(t,prev)=>{
+    const ids=await fetch(`${BASE}/${EP[t]}.json`).then(r=>r.json());
+    setAllIds(ids);
+    setNewIds(prev.size>0?new Set(ids.slice(0,PAGE).filter(id=>!prev.has(id))):new Set());
+    setLastIds(new Set(ids.slice(0,PAGE)));
+    return ids;
+  },[]);
+
+  const fetchPage=useCallback(async(ids,pageNum)=>{
+    const slice=ids.slice((pageNum-1)*PAGE,pageNum*PAGE);
+    const results=await Promise.all(slice.map(id=>fetch(`${BASE}/item/${id}.json`).then(r=>r.json())));
+    return results.filter(Boolean);
+  },[]);
+
+  const doTranslate=useCallback(async(newItems,currentLang)=>{
+    if(currentLang==='en'){setTrans({});return;}
+    setTranslating(true);
+    const untranslated=newItems.filter(i=>!trans[i.id+'_'+currentLang]);
+    if(!untranslated.length){setTranslating(false);return;}
+    const titles=untranslated.map(i=>i.title);
+    const translated=await translateBatch(titles,currentLang);
+    if(translated){
+      setTrans(prev=>{
+        const next={...prev};
+        untranslated.forEach((item,idx)=>{next[item.id+'_'+currentLang]=translated[idx];});
+        return next;
+      });
+    }
+    setTranslating(false);
+  },[trans]);
+
+  useEffect(()=>{
+    setLoading(true);setItems([]);setTrans({});setAllIds([]);setNewIds(new Set());setPage(1);setActiveFilters(new Set());
+    fetchIds(tab,new Set())
+      .then(ids=>fetchPage(ids,1))
+      .then(data=>{setItems(data);setLoading(false);return data;})
+      .then(data=>doTranslate(data,lang))
+      .catch(()=>setLoading(false));
+    clearInterval(t1.current);clearInterval(t2.current);
+    setCd(60);
+    t1.current=setInterval(()=>{
+      setCd(60);
+      setLastIds(prev=>{
+        fetchIds(tab,prev).then(ids=>fetchPage(ids,1)).then(data=>{setItems(data);setPage(1);doTranslate(data,lang);});
+        return prev;
+      });
+    },60000);
+    t2.current=setInterval(()=>setCd(c=>c<=1?60:c-1),1000);
+    return()=>{clearInterval(t1.current);clearInterval(t2.current);};
+  },[tab]);
+
+  useEffect(()=>{
+    if(!items.length)return;
+    if(lang==='en'){setTrans({});return;}
+    doTranslate(items,lang);
+  },[lang]);
+
+  const loadMore=useCallback(()=>{
+    if(loadingMore)return;
+    const nextPage=page+1;
+    setLoadingMore(true);
+    fetchPage(allIds,nextPage).then(data=>{
+      setItems(prev=>[...prev,...data]);
+      setPage(nextPage);
+      setLoadingMore(false);
+      if(lang!=='en')doTranslate(data,lang);
+    }).catch(()=>setLoadingMore(false));
+  },[allIds,page,loadingMore,fetchPage,lang,doTranslate]);
+
+  const availableTags=useMemo(()=>{
+    const counts={};
+    items.forEach(item=>{getTags(item.title).forEach(t=>{counts[t]=(counts[t]||0)+1;});});
+    return Object.entries(counts).filter(([,c])=>c>0).sort((a,b)=>b[1]-a[1]).map(([t,c])=>({tag:t,count:c}));
+  },[items]);
+
+  const filteredItems=useMemo(()=>{
+    if(!activeFilters.size)return items;
+    return items.filter(item=>[...activeFilters].every(f=>getTags(item.title).includes(f)));
+  },[items,activeFilters]);
+
+  const toggleFilter=useCallback(tag=>{
+    setActiveFilters(prev=>{const n=new Set(prev);n.has(tag)?n.delete(tag):n.add(tag);return n;});
+  },[]);
+
+  const hasMore=allIds.length>page*PAGE;
+  const skels=Array.from({length:PAGE},(_,i)=>i);
+  const isES=lang!=='en';
+
+  return h('div',{className:'nx','data-dark':dark?'1':undefined},
+
+    h('div',{className:'nx-nav'},
+      h('div',{className:'nx-logo',onClick:()=>window.open('https://nuxiens.org','_blank')},
+        h('div',{className:'nx-logo-box'},h('span',{className:'nx-logo-n'},'N')),
+        h('span',{className:'nx-logo-name'},'Nuxiens'),
+        h('span',{className:'nx-logo-sep'},'·'),
+        h('span',{className:'nx-logo-url'},'nuxiens.org')
+      ),
+      h('div',{className:'nx-nav-right'},
+        h('div',{style:{position:'relative'},ref:langRef},
+          h('button',{
+            className:`nx-lang-btn${isES?' active':''}`,
+            onClick:()=>setShowLangs(s=>!s)
+          },
+            isES&&h('span',{className:'nx-lang-dot'}),
+            lang.toUpperCase(),
+            ' ▾'
+          ),
+          showLangs&&h('div',{style:{
+            position:'absolute',top:'calc(100% + 6px)',right:0,
+            background:dark?'#1A1A1A':'#fff',
+            border:`1px solid ${dark?'#2A2A2A':'#E5E5E5'}`,
+            borderRadius:6,padding:'4px',zIndex:999,minWidth:80,
+            boxShadow:'0 4px 16px rgba(0,0,0,.15)'
+          }},
+            LANGS.map(l=>h('button',{
+              key:l.id,
+              onClick:()=>{setLang(l.id);setShowLangs(false);},
+              style:{
+                display:'block',width:'100%',textAlign:'left',
+                fontFamily:'var(--mono)',fontSize:10,
+                padding:'6px 10px',border:'none',borderRadius:3,cursor:'pointer',
+                background:lang===l.id?(dark?'#2A2A2A':'#F5F5F5'):'transparent',
+                color:lang===l.id?'var(--accent)':'var(--text2)',
+                transition:'all .1s',letterSpacing:'.3px'
+              }
+            },l.label,' ',h('span',{style:{opacity:.45,fontSize:9}},LANG_NAMES[l.id])))
+          )
+        ),
+        h('button',{className:'nx-nav-btn',onClick:()=>setAbout(a=>!a)},about?'cerrar':'about'),
+        h('button',{className:'nx-nav-btn nx-nav-donate',onClick:()=>window.open('https://nuxiens.org/donar','_blank')},'♥ donate'),
+        h('button',{className:'nx-dark-btn',onClick:()=>setDark(d=>!d)},dark?'☀':'☾')
+      )
+    ),
+
+    h('div',{className:'nx-subbar'},
+      h('div',{className:'nx-tabs'},
+        TABS.map(t=>h('button',{key:t.id,className:`nx-tab${tab===t.id?' on':''}`,onClick:()=>setTab(t.id)},t.label))
+      ),
+      h('div',{className:'nx-status-bar'},
+        translating&&h('span',{className:'nx-trans-badge'},h('span',{className:'nx-spin'}),'translating…'),
+        newIds.size>0&&h('span',{style:{color:'#22C55E'}},'+'+newIds.size+' new'),
+        h('span',{className:'nx-pulse'}),
+        h('span',null,loading?'loading...':'↻ '+fmtCd(cd))
+      )
+    ),
+
+    about&&h('div',{className:'nx-about'},
+      h('div',{className:'nx-about-text'},
+        h('strong',null,'Nuxiens'),' is a community-curated global news platform. We surface the most relevant stories in tech, science and business — voted by engineers, founders and analysts worldwide. No ads. No editorial agenda.'
+      ),
+      h('button',{className:'nx-about-cta',onClick:()=>window.open('https://nuxiens.org/donar','_blank')},'♥ support the project')
+    ),
+
+    !loading&&availableTags.length>0&&h('div',{className:'nx-filter-bar'},
+      h('span',{className:'nx-filter-label'},'filter'),
+      ...availableTags.map(({tag,count})=>
+        h('button',{key:tag,
+          className:`nx-filter-chip${activeFilters.has(tag)?' on':''}`,
+          style:activeFilters.has(tag)?{background:TAGS.find(t=>t.tag===tag)?.color,borderColor:'transparent'}:{},
+          onClick:()=>toggleFilter(tag)},
+          h(TagPill,{tag,active:activeFilters.has(tag),dark}),
+          h('span',{className:'nx-chip-count'},count)
+        )
+      ),
+      activeFilters.size>0&&h('button',{className:'nx-filter-clear',onClick:()=>setActiveFilters(new Set())},'clear ✕'),
+      activeFilters.size>0&&h('span',{className:'nx-filter-result'},filteredItems.length+' result'+(filteredItems.length!==1?'s':''))
+    ),
+
+    loading
+      ?h('ul',{className:'nx-list'},skels.map(i=>
+          h('li',{key:i,className:'nx-item'},
+            h('div',{className:'nx-rank',style:{opacity:.2}},i+1),
+            h('div',{className:'nx-vote-col'}),
+            h('div',{className:'nx-body-col nx-sk'},
+              h('div',{className:'nx-skb',style:{height:13,width:`${48+Math.random()*38}%`,marginBottom:7}}),
+              h('div',{className:'nx-skb',style:{height:9,width:`${22+Math.random()*18}%`}})
+            )
+          )
+        ))
+      :h('div',null,
+          filteredItems.length===0
+            ?h('div',{className:'nx-empty'},'no stories match the selected filters')
+            :h('ul',{className:'nx-list'},
+                filteredItems.map((item,i)=>h(Row,{
+                  key:item.id,item,rank:i+1,
+                  isNew:newIds.has(item.id),
+                  translation:lang!=='en'?trans[item.id+'_'+lang]:null,
+                  onTagClick:toggleFilter,dark
+                }))
+              ),
+          !activeFilters.size&&hasMore&&h('div',{className:'nx-more-wrap'},
+            h('button',{className:'nx-more-btn',disabled:loadingMore,onClick:loadMore},
+              loadingMore?'loading...':'load more  ↓'
+            ),
+            h('div',{className:'nx-more-info'},'showing '+items.length+' of '+allIds.length)
+          )
+        ),
+
+    h('div',{className:'nx-foot'},
+      h('span',{className:'nx-foot-txt'},'hacker news · auto-refresh 60s'+(items.length?' · '+items.length+' loaded':'')),
+      h('span',{className:'nx-foot-txt'},'© 2025 nuxiens.org')
+    )
+  );
+}
+ReactDOM.createRoot(document.getElementById('nxroot')).render(h(App,null));
+</script>
