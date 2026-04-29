@@ -202,10 +202,7 @@ function Row({item,rank,isNew,translation,onTagClick,dark,lang}){
         h('span',null,item.by),
         h('span',{className:'nx-meta-sep'},'·'),
         h('span',null,ago(item.time)),
-        item.descendants>0&&[
-          h('span',{key:'sep',className:'nx-meta-sep'},'·'),
-          h('a',{key:'c',className:'nx-comments',href:commentsUrl,target:'_blank',rel:'noopener'},item.descendants+' comments')
-        ]
+        null
       )
     )
   );
@@ -450,7 +447,8 @@ function App(){
 
     h('div',{className:'nx-foot'},
       h('span',{className:'nx-foot-txt'},'auto-refresh 60s'+(items.length?' · '+items.length+' loaded':'')),
-      h('span',{className:'nx-foot-txt'},'© 2025 nuxiens.org · Supported by TNY Holdings')
+      h('span',{className:'nx-foot-txt'},'© 2025 nuxiens.org · Supported by TNY Holdings'),
+      h('span',{className:'nx-foot-txt',style:{marginTop:4,display:'block',opacity:.6}},'Agradecemos sinceramente el apoyo de TNY Holdings, las comunidades tecnológicas de Latinoamérica y todos los colaboradores y lectores que hacen posible este proyecto.')
     )
   );
 }
