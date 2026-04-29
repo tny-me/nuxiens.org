@@ -148,22 +148,21 @@ function ago(ts){const s=Math.floor(Date.now()/1000-ts);if(s<60)return s+'s';if(
 function dom(url){if(!url)return null;try{return new URL(url).hostname.replace(/^www\./,'');}catch{return null;}}
 function fmtCd(s){return s>=60?`${Math.floor(s/60)}m ${s%60}s`:`${s}s`;}
 
+const GT_LANG={zh:'zh-CN',pt:'pt',ja:'ja',fr:'fr',de:'de',es:'es'};
 async function translateBatch(titles,lang){
   if(lang==='en')return titles;
-  const langName=LANG_NAMES[lang]||lang;
+  const tl=GT_LANG[lang]||lang;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,
-        messages:[{role:'user',content:`Translate these news headlines to ${langName}. Rules: 1) Do NOT translate proper nouns, product names, company names or brands. 2) Return ONLY a valid JSON array with exactly ${titles.length} strings. No backticks, no extra text.\n${JSON.stringify(titles)}`}]
-      })
-    });
-    const d=await res.json();
-    if(d.error)return null;
-    const txt=d.content[0].text.trim().replace(/```json|```/g,'').trim();
-    const parsed=JSON.parse(txt);
-    if(Array.isArray(parsed)&&parsed.length===titles.length)return parsed;
-  }catch(e){}
-  return null;
+    const results=await Promise.all(
+      titles.map(q=>
+        fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${tl}&dt=t&q=${encodeURIComponent(q)}`)
+          .then(r=>r.json())
+          .then(d=>d[0]?d[0].map(s=>s[0]).join(''):q)
+          .catch(()=>q)
+      )
+    );
+    return results;
+  }catch(e){return null;}
 }
 
 function TagPill({tag,active,onClick,dark}){
@@ -176,12 +175,16 @@ function TagPill({tag,active,onClick,dark}){
     onClick:onClick?e=>{e.stopPropagation();onClick(tag);}:undefined},tag);
 }
 
-function Row({item,rank,isNew,translation,onTagClick,dark}){
+function Row({item,rank,isNew,translation,onTagClick,dark,lang}){
   const[pts,setPts]=useState(item.score||0);
   const[voted,setVoted]=useState(false);
   const d=dom(item.url);
   const tags=useMemo(()=>getTags(item.title),[item.title]);
   const commentsUrl=`https://news.ycombinator.com/item?id=${item.id}`;
+  const tl=GT_LANG[lang]||lang;
+  const articleHref=item.url&&lang!=='en'
+    ?`https://translate.google.com/translate?sl=auto&tl=${tl}&u=${encodeURIComponent(item.url)}`
+    :item.url||commentsUrl;
   return h('li',{className:`nx-item${isNew?' isnew':''}`},
     h('div',{className:'nx-rank'},rank),
     h('div',{className:'nx-vote-col'},
@@ -190,7 +193,7 @@ function Row({item,rank,isNew,translation,onTagClick,dark}){
     ),
     h('div',{className:'nx-body-col'},
       h('div',{className:'nx-title-row'},
-        h('a',{className:'nx-ttl',href:item.url||commentsUrl,target:'_blank',rel:'noopener'},item.title),
+        h('a',{className:'nx-ttl',href:articleHref,target:'_blank',rel:'noopener'},item.title),
         d&&h('span',{className:'nx-domain'},d),
         isNew&&h('span',{className:'nx-new-chip'},'new'),
         ...tags.map(t=>h(TagPill,{key:t,tag:t,active:false,onClick:onTagClick,dark}))
@@ -225,7 +228,7 @@ function App(){
   const[cd,setCd]=useState(60);
   const[about,setAbout]=useState(false);
   const[dark,setDark]=useState(false);
-  const[lang,setLang]=useState('en');
+  const[lang,setLang]=useState('es');
   const[showLangs,setShowLangs]=useState(false);
   const[activeFilters,setActiveFilters]=useState(new Set());
   const t1=useRef(),t2=useRef();
@@ -254,14 +257,27 @@ function App(){
   const doTranslate=useCallback(async(newItems,currentLang)=>{
     if(currentLang==='en'){setTrans({});return;}
     setTranslating(true);
-    const untranslated=newItems.filter(i=>!trans[i.id+'_'+currentLang]);
+    const cached={};
+    const untranslated=[];
+    newItems.forEach(i=>{
+      const key=i.id+'_'+currentLang;
+      if(trans[key])return;
+      const stored=localStorage.getItem('nx_'+key);
+      if(stored)cached[key]=stored;
+      else untranslated.push(i);
+    });
+    if(Object.keys(cached).length)setTrans(prev=>({...prev,...cached}));
     if(!untranslated.length){setTranslating(false);return;}
     const titles=untranslated.map(i=>i.title);
     const translated=await translateBatch(titles,currentLang);
     if(translated){
       setTrans(prev=>{
         const next={...prev};
-        untranslated.forEach((item,idx)=>{next[item.id+'_'+currentLang]=translated[idx];});
+        untranslated.forEach((item,idx)=>{
+          const key=item.id+'_'+currentLang;
+          next[key]=translated[idx];
+          try{localStorage.setItem('nx_'+key,translated[idx]);}catch(e){}
+        });
         return next;
       });
     }
@@ -424,7 +440,7 @@ function App(){
                   key:item.id,item,rank:i+1,
                   isNew:newIds.has(item.id),
                   translation:lang!=='en'?trans[item.id+'_'+lang]:null,
-                  onTagClick:toggleFilter,dark
+                  onTagClick:toggleFilter,dark,lang
                 }))
               ),
           !activeFilters.size&&hasMore&&h('div',{className:'nx-more-wrap'},
