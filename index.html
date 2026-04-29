@@ -59,7 +59,7 @@
 .nx-filter-result{font-family:var(--mono);font-size:9px;color:var(--text3)}
 
 .nx-about{background:var(--surface);border-bottom:2px solid var(--border);padding:16px 20px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
-.nx-about-text{font-size:13px;color:var(--text2);line-height:1.65;max-width:540px}
+.nx-about-text{font-size:13px;color:var(--text2);line-height:1.65;max-width:820px}
 .nx-about-text strong{color:var(--text);font-weight:500}
 .nx-about-cta{font-family:var(--mono);font-size:10px;padding:6px 12px;border:1px solid var(--accent);border-radius:3px;background:none;cursor:pointer;color:var(--accent);transition:all .15s;white-space:nowrap;flex-shrink:0}
 .nx-about-cta:hover{background:var(--accent);color:#fff}
@@ -398,7 +398,7 @@ function App(){
 
     about&&h('div',{className:'nx-about'},
       h('div',{className:'nx-about-text'},
-        h('strong',null,'Nuxiens'),' es un agregador de noticias gratuito y de acceso abierto con miles de historias diarias en tecnología, inteligencia artificial, ciberseguridad, ciencia y negocios. La visión de nuxiens.org es poner al alcance de Latinoamérica la información que mueve al mundo — valorada por ingenieros, fundadores, revistas e investigadores de primer nivel.'
+        h('strong',null,'Nuxiens'),' es un agregador de noticias gratuito y de acceso abierto con miles de historias diarias en tecnología, inteligencia artificial, ciberseguridad, ciencia y negocios. La visión de ',h('a',{href:'https://nuxiens.org',target:'_blank',rel:'noopener',style:{color:'#1D4ED8',textDecoration:'none'}},'nuxiens.org'),' es poner al alcance de Latinoamérica la información que mueve al mundo — valorada por ingenieros, fundadores, revistas e investigadores de primer nivel.'
       ),
       h('button',{className:'nx-about-cta',onClick:()=>window.open('https://nuxiens.org/donar','_blank')},'♥ support the project')
     ),
