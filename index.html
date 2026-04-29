@@ -181,10 +181,8 @@ function Row({item,rank,isNew,translation,onTagClick,dark,lang}){
   const d=dom(item.url);
   const tags=useMemo(()=>getTags(item.title),[item.title]);
   const commentsUrl=`https://news.ycombinator.com/item?id=${item.id}`;
-  const tl=GT_LANG[lang]||lang;
-  const articleHref=item.url&&lang!=='en'
-    ?`https://translate.google.com/translate?sl=auto&tl=${tl}&u=${encodeURIComponent(item.url)}`
-    :item.url||commentsUrl;
+  const articleHref=item.url||commentsUrl;
+  const displayTitle=translation||item.title;
   return h('li',{className:`nx-item${isNew?' isnew':''}`},
     h('div',{className:'nx-rank'},rank),
     h('div',{className:'nx-vote-col'},
@@ -193,12 +191,11 @@ function Row({item,rank,isNew,translation,onTagClick,dark,lang}){
     ),
     h('div',{className:'nx-body-col'},
       h('div',{className:'nx-title-row'},
-        h('a',{className:'nx-ttl',href:articleHref,target:'_blank',rel:'noopener'},item.title),
+        h('a',{className:'nx-ttl',href:articleHref,target:'_blank',rel:'noopener'},displayTitle),
         d&&h('span',{className:'nx-domain'},d),
         isNew&&h('span',{className:'nx-new-chip'},'new'),
         ...tags.map(t=>h(TagPill,{key:t,tag:t,active:false,onClick:onTagClick,dark}))
       ),
-      translation&&h('span',{className:'nx-ttl-translated'},translation),
       h('div',{className:'nx-meta'},
         h('span',{className:'nx-meta-pts'},pts+' pts'),
         h('span',{className:'nx-meta-sep'},'·'),
