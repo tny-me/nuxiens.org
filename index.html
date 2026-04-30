@@ -200,7 +200,8 @@ function BlogPost({post,rank}){
       ),
       h('p',{className:'nx-ttl-translated',style:{display:'block',marginTop:4}},post.excerpt),
       open&&paragraphs.length>0&&h('div',{style:{marginTop:12,borderTop:'1px solid var(--border)',paddingTop:12}},
-        paragraphs.map((p,i)=>h('p',{key:i,style:{fontSize:13,color:'var(--text2)',lineHeight:1.75,marginTop:i>0?12:0}},p))
+        ...paragraphs.map((p,i)=>h('p',{key:i,style:{fontSize:13,color:'var(--text2)',lineHeight:1.75,marginTop:i>0?12:0}},p)),
+        h('p',{style:{fontSize:13,color:'var(--text3)',lineHeight:1.75,marginTop:16,fontStyle:'italic'}},'— El equipo de Nuxiens.')
       ),
       h('div',{className:'nx-meta',style:{marginTop:6}},
         h('span',{style:{cursor:'pointer',color:'var(--accent)',fontFamily:'var(--mono)',fontSize:10},onClick:()=>setOpen(o=>!o)},
