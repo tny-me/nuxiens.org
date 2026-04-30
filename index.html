@@ -1,4 +1,5 @@
 
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='5' fill='%23B31B1B'/><text x='16' y='23' font-family='monospace' font-size='18' font-weight='500' fill='white' text-anchor='middle'>N</text></svg>">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -103,6 +104,23 @@
 .nx-empty{padding:36px 20px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--text3)}
 .nx-foot{background:var(--nav);border-top:1px solid rgba(255,255,255,.07);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
 .nx-foot-txt{font-family:var(--mono);font-size:9px;color:var(--nav-sub);letter-spacing:.3px}
+
+@media(max-width:620px){
+  .nx-logo-sep,.nx-logo-url{display:none}
+  .nx-nav-btn:not(.nx-nav-donate){display:none}
+  .nx-nav{padding:0 12px;gap:8px}
+  .nx-subbar{padding:0 12px}
+  .nx-filter-bar{padding:8px 12px;gap:6px}
+  .nx-about{flex-direction:column}
+  .nx-about-text{max-width:100%;font-size:13px}
+  .nx-item{grid-template-columns:34px 22px 1fr;padding:10px 12px 10px 0}
+  .nx-rank{padding:2px 8px 0 10px;font-size:11px}
+  .nx-ttl{font-size:13px}
+  .nx-meta{font-size:9px}
+  .nx-foot{flex-direction:column;align-items:flex-start;gap:6px}
+  .nx-more-wrap{padding:12px}
+  .nx-status-bar{font-size:8px;gap:5px}
+}
 </style>
 
 <div class="nx" id="nxroot"></div>
