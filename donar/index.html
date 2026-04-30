@@ -1,0 +1,159 @@
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Apoya a Nuxiens — el agregador de noticias tecnológicas para Latinoamérica">
+<title>Donar · Nuxiens</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='5' fill='%23B31B1B'/><text x='16' y='23' font-family='monospace' font-size='18' font-weight='500' fill='white' text-anchor='middle'>N</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FAFAFA;--surface:#FFFFFF;--border:#E5E5E5;
+  --text:#111111;--text2:#555555;--text3:#999999;
+  --accent:#B31B1B;--accent-light:#FFF5F5;
+  --nav:#111111;--nav-sub:rgba(255,255,255,.45);
+  --font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+[data-dark="1"]{
+  --bg:#111111;--surface:#1A1A1A;--border:#2A2A2A;
+  --text:#EEEEEE;--text2:#999999;--text3:#555555;
+  --accent:#E05252;--accent-light:#2A1515;
+  --nav:#000000;
+}
+body{background:var(--bg);font-family:var(--font);color:var(--text);transition:background .2s,color .2s;min-height:100vh}
+
+/* NAV */
+.nx-nav{background:var(--nav);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:48px}
+.nx-logo{display:flex;align-items:center;gap:9px;cursor:pointer;text-decoration:none}
+.nx-logo-box{width:26px;height:26px;border-radius:4px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nx-logo-n{font-size:13px;font-weight:500;color:#fff;font-family:var(--mono)}
+.nx-logo-name{font-size:14px;font-weight:500;color:#fff;letter-spacing:-.2px}
+.nx-logo-sep{color:var(--nav-sub);margin:0 2px}
+.nx-logo-url{font-family:var(--mono);font-size:10px;color:var(--nav-sub)}
+.nx-dark-btn{width:28px;height:28px;border:1px solid rgba(255,255,255,.18);border-radius:4px;background:none;cursor:pointer;color:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s}
+.nx-dark-btn:hover{border-color:rgba(255,255,255,.5);color:#fff}
+
+/* HERO */
+.nx-hero{padding:48px 20px 32px;text-align:center;border-bottom:1px solid var(--border)}
+.nx-hero-icon{font-size:32px;margin-bottom:16px}
+.nx-hero-title{font-size:26px;font-weight:600;color:var(--text);letter-spacing:-.4px;margin-bottom:12px}
+.nx-hero-sub{font-size:14px;color:var(--text2);line-height:1.7;max-width:480px;margin:0 auto}
+
+/* CARDS */
+.nx-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;max-width:900px;margin:40px auto;padding:0 20px}
+.nx-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:28px 24px;display:flex;flex-direction:column;gap:12px;cursor:pointer;text-decoration:none;color:inherit;transition:border-color .15s,box-shadow .15s,transform .1s;position:relative}
+.nx-card:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(179,27,27,.1);transform:translateY(-2px)}
+.nx-card.popular{border-color:var(--accent);box-shadow:0 2px 12px rgba(179,27,27,.12)}
+.nx-badge{font-family:var(--mono);font-size:9px;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;border-radius:3px;width:fit-content}
+.nx-badge-popular{background:var(--accent);color:#fff}
+.nx-badge-generous{background:#7C3AED;color:#fff}
+.nx-badge-free{background:var(--border);color:var(--text2)}
+.nx-card-price{font-size:28px;font-weight:600;color:var(--text);letter-spacing:-.5px;font-family:var(--mono)}
+.nx-card-price span{font-size:13px;font-weight:400;color:var(--text3);letter-spacing:0;margin-left:2px}
+.nx-card-msg{font-size:12px;color:var(--text2);line-height:1.6;flex:1}
+.nx-card-cta{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:8px;padding:10px 16px;border-radius:5px;background:var(--accent);color:#fff;font-family:var(--mono);font-size:11px;letter-spacing:.3px;transition:background .15s}
+.nx-card:hover .nx-card-cta{background:#991515}
+[data-dark="1"] .nx-card:hover .nx-card-cta{background:#c03030}
+.nx-card.popular .nx-card-price{color:var(--accent)}
+
+/* FREE AMOUNT */
+.nx-free-input-wrap{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:5px;padding:8px 12px;background:var(--bg)}
+.nx-free-label{font-family:var(--mono);font-size:12px;color:var(--text3)}
+.nx-free-input{font-family:var(--mono);font-size:20px;font-weight:500;color:var(--text);background:none;border:none;outline:none;width:100%;min-width:0}
+.nx-free-cur{font-family:var(--mono);font-size:11px;color:var(--text3);flex-shrink:0}
+
+/* TRUST */
+.nx-trust{text-align:center;padding:0 20px 48px;max-width:500px;margin:0 auto}
+.nx-trust-txt{font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.8;letter-spacing:.2px}
+
+/* FOOTER */
+.nx-foot{background:var(--nav);border-top:1px solid rgba(255,255,255,.07);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.nx-foot-txt{font-family:var(--mono);font-size:9px;color:var(--nav-sub);letter-spacing:.3px}
+
+@media(max-width:620px){
+  .nx-logo-sep,.nx-logo-url{display:none}
+  .nx-nav{padding:0 12px}
+  .nx-hero{padding:32px 16px 24px}
+  .nx-hero-title{font-size:22px}
+  .nx-cards{grid-template-columns:1fr;padding:0 16px;margin:28px auto}
+  .nx-foot{flex-direction:column;align-items:flex-start}
+}
+</style>
+
+<div id="root">
+
+<nav class="nx-nav">
+  <a class="nx-logo" href="/">
+    <div class="nx-logo-box"><span class="nx-logo-n">N</span></div>
+    <span class="nx-logo-name">Nuxiens</span>
+    <span class="nx-logo-sep">·</span>
+    <span class="nx-logo-url">nuxiens.org</span>
+  </a>
+  <button class="nx-dark-btn" id="darkBtn" title="Cambiar tema">☾</button>
+</nav>
+
+<div class="nx-hero">
+  <div class="nx-hero-icon">♥</div>
+  <h1 class="nx-hero-title">Apoya a Nuxiens</h1>
+  <p class="nx-hero-sub">Sin anuncios, sin agenda. Nuxiens se sostiene gracias a lectores como tú. Cada aporte mantiene la plataforma libre y accesible para toda Latinoamérica.</p>
+</div>
+
+<div class="nx-cards">
+
+  <!-- 200 MXN -->
+  <a class="nx-card" href="https://buy.stripe.com/3cI4gyeQtbj1a7TfMqcfK03" target="_blank" rel="noopener">
+    <span class="nx-badge nx-badge-generous">Generoso</span>
+    <div class="nx-card-price">$200 <span>MXN</span></div>
+    <p class="nx-card-msg">Eres parte del <strong>15%</strong> de los lectores más generosos que donan este importe.</p>
+    <div class="nx-card-cta">Donar $200 →</div>
+  </a>
+
+  <!-- 100 MXN — POPULAR -->
+  <a class="nx-card popular" href="https://buy.stripe.com/aFa6oG6jXgDla7T8jYcfK02" target="_blank" rel="noopener">
+    <span class="nx-badge nx-badge-popular">Más elegido</span>
+    <div class="nx-card-price">$100 <span>MXN</span></div>
+    <p class="nx-card-msg">Eres parte del <strong>70%</strong> de los lectores que eligen donar este importe.</p>
+    <div class="nx-card-cta">Donar $100 →</div>
+  </a>
+
+  <!-- 70 MXN -->
+  <a class="nx-card" href="https://buy.stripe.com/3cIbJ0bEhgDl0xj9o2cfK01" target="_blank" rel="noopener">
+    <span class="nx-badge nx-badge-free">Colaborador</span>
+    <div class="nx-card-price">$70 <span>MXN</span></div>
+    <p class="nx-card-msg">Eres parte del <strong>28%</strong> de los lectores que donan este importe.</p>
+    <div class="nx-card-cta">Donar $70 →</div>
+  </a>
+
+  <!-- MONTO LIBRE -->
+  <a class="nx-card" href="https://buy.stripe.com/14AfZg0ZDbj14Nz8jYcfK00" target="_blank" rel="noopener">
+    <span class="nx-badge nx-badge-free">Tú decides</span>
+    <div class="nx-card-price">Libre <span>MXN</span></div>
+    <p class="nx-card-msg">Elige el monto que quieras. Cualquier cantidad suma y es bienvenida.</p>
+    <div class="nx-card-cta">Elegir monto →</div>
+  </a>
+
+</div>
+
+<div class="nx-trust">
+  <p class="nx-trust-txt">Pagos procesados de forma segura por Stripe · No guardamos datos de tarjetas<br>Nuxiens es un proyecto de TNY Holdings · nuxiens.org</p>
+</div>
+
+<footer class="nx-foot">
+  <span class="nx-foot-txt">© 2025 nuxiens.org · Supported by TNY Holdings</span>
+  <span class="nx-foot-txt"><a href="/" style="color:inherit;text-decoration:none">← volver al inicio</a></span>
+</footer>
+
+</div>
+
+<script>
+const root=document.getElementById('root');
+const btn=document.getElementById('darkBtn');
+const saved=localStorage.getItem('nx-dark');
+if(saved==='1'){root.setAttribute('data-dark','1');btn.textContent='☀';}
+btn.addEventListener('click',()=>{
+  const on=root.getAttribute('data-dark')==='1';
+  root.setAttribute('data-dark',on?'':'1');
+  btn.textContent=on?'☾':'☀';
+  localStorage.setItem('nx-dark',on?'':'1');
+});
+</script>
