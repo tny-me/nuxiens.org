@@ -171,19 +171,30 @@ const TAGS=[
 // Para agregar una entrada: copia el bloque { } y edita los campos.
 const POSTS=[
   {
+    id:2,
+    title:'El Fin de la Entropía Informativa',
+    date:'27 de septiembre, 2026',
+    excerpt:'El panorama digital contemporáneo se enfrenta a una crisis de saturación. La acumulación exponencial de datos no se ha traducido en un incremento proporcional de la sabiduría.',
+    body:'El panorama digital contemporáneo se enfrenta a una crisis de saturación. La acumulación exponencial de datos no se ha traducido en un incremento proporcional de la sabiduría. Ante este escenario, se anuncia el inicio del proyecto nuxiens.org, una iniciativa que nace no para competir en la economía de la atención, sino para fundar la economía del entendimiento.\n\nNuxiens surge de una ausencia crítica: un espacio donde el conocimiento sea destilado, no solo almacenado. No buscamos replicar los modelos de difusión masiva; nuestra misión es construir el lugar donde nos gustaría habitar intelectualmente. El dominio permanece hoy en blanco, pero su propósito está definido por una estructura lógica, multidisciplinaria y orientada a resultados. La meta es clara: convertir el ruido informativo en una arquitectura de pensamiento accionable.',
+    url:null
+  },
+  {
     id:1,
     title:'Bienvenidos a Nuxiens',
     date:'30 de abril, 2025',
     excerpt:'Nuxiens nace con la misión de acercar la información tecnológica más relevante a Latinoamérica. Somos un agregador de noticias curado por la comunidad, sin anuncios y sin agenda editorial. Gracias por ser parte de esto.',
+    body:null,
     url:null
   },
 ];
 
 function BlogPost({post}){
+  const content=post.body||post.excerpt;
+  const paragraphs=content.split('\n\n').filter(Boolean);
   return h('article',{className:'nx-blog-post'},
     h('div',{className:'nx-blog-date'},post.date),
     h('h2',{className:'nx-blog-title'},post.title),
-    h('p',{className:'nx-blog-excerpt'},post.excerpt),
+    ...paragraphs.map((p,i)=>h('p',{key:i,className:'nx-blog-excerpt',style:{marginTop:i>0?12:0}},p)),
     post.url&&h('a',{className:'nx-blog-link',href:post.url,target:'_blank',rel:'noopener'},'Leer más →')
   );
 }
