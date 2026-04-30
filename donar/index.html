@@ -40,7 +40,7 @@ body{background:var(--bg);font-family:var(--font);color:var(--text);transition:b
 .nx-hero-sub{font-size:14px;color:var(--text2);line-height:1.7;max-width:480px;margin:0 auto}
 
 /* CARDS */
-.nx-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;max-width:900px;margin:40px auto;padding:0 20px}
+.nx-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1100px;margin:40px auto;padding:0 20px}
 .nx-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:28px 24px;display:flex;flex-direction:column;gap:12px;cursor:pointer;text-decoration:none;color:inherit;transition:border-color .15s,box-shadow .15s,transform .1s;position:relative}
 .nx-card:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(179,27,27,.1);transform:translateY(-2px)}
 .nx-card.popular{border-color:var(--accent);box-shadow:0 2px 12px rgba(179,27,27,.12)}
@@ -75,7 +75,8 @@ body{background:var(--bg);font-family:var(--font);color:var(--text);transition:b
   .nx-nav{padding:0 12px}
   .nx-hero{padding:32px 16px 24px}
   .nx-hero-title{font-size:22px}
-  .nx-cards{grid-template-columns:1fr;padding:0 16px;margin:28px auto}
+  .nx-cards{grid-template-columns:1fr 1fr;padding:0 16px;margin:28px auto}
+  @media(max-width:420px){.nx-cards{grid-template-columns:1fr}}
   .nx-foot{flex-direction:column;align-items:flex-start}
 }
 </style>
@@ -93,7 +94,6 @@ body{background:var(--bg);font-family:var(--font);color:var(--text);transition:b
 </nav>
 
 <div class="nx-hero">
-  <div class="nx-hero-icon">♥</div>
   <h1 class="nx-hero-title">Apoya a Nuxiens</h1>
   <p class="nx-hero-sub">Sin anuncios, sin agenda. Nuxiens se sostiene gracias a lectores como tú. Cada aporte mantiene la plataforma libre y accesible para toda Latinoamérica.</p>
 </div>
