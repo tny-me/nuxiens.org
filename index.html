@@ -101,6 +101,14 @@
 @keyframes sh{0%,100%{opacity:.25}50%{opacity:.65}}
 .nx-skb{background:var(--border);border-radius:2px}
 
+.nx-blog-post{padding:24px 20px;border-bottom:1px solid var(--border);background:var(--surface)}
+.nx-blog-post:hover{background:var(--bg)}
+.nx-blog-date{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.4px;margin-bottom:8px}
+.nx-blog-title{font-size:17px;font-weight:500;color:var(--text);margin-bottom:10px;line-height:1.4}
+.nx-blog-excerpt{font-size:13px;color:var(--text2);line-height:1.7;max-width:640px}
+.nx-blog-link{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--accent);text-decoration:none}
+.nx-blog-link:hover{text-decoration:underline}
+.nx-foot-donate{display:none;font-family:var(--mono);font-size:10px;padding:7px 16px;border-radius:4px;background:var(--accent);border:none;cursor:pointer;color:#fff;letter-spacing:.2px}
 .nx-empty{padding:36px 20px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--text3)}
 .nx-foot{background:var(--nav);border-top:1px solid rgba(255,255,255,.07);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
 .nx-foot-txt{font-family:var(--mono);font-size:9px;color:var(--nav-sub);letter-spacing:.3px}
@@ -108,6 +116,7 @@
 @media(max-width:620px){
   .nx-logo-sep,.nx-logo-url{display:none}
   .nx-nav-donate{display:none}
+  .nx-foot-donate{display:inline-flex}
   .nx-nav{padding:0 12px;gap:8px}
   .nx-subbar{padding:0 12px}
   .nx-filter-bar{padding:8px 12px;gap:6px}
@@ -130,7 +139,7 @@
 const {useState,useEffect,useRef,useCallback,useMemo}=React;
 const h=React.createElement;
 const BASE='https://hacker-news.firebaseio.com/v0';
-const TABS=[{id:'top',label:'top'},{id:'new',label:'new'}];
+const TABS=[{id:'top',label:'top'},{id:'new',label:'new'},{id:'blog',label:'blog'}];
 const EP={top:'topstories',new:'newstories'};
 const PAGE=30;
 
@@ -157,6 +166,27 @@ const TAGS=[
   {tag:'business',color:'#1D4ED8',bg:'#EFF6FF',dbg:'#0A1628',kw:['google','apple','meta','microsoft','amazon','tesla','twitter','tiktok','netflix','layoff','employee','ceo','revenue','profit','market','stock','antitrust','regulation']},
   {tag:'crypto',color:'#D97706',bg:'#FFFBEB',dbg:'#2A1A00',kw:['bitcoin','ethereum','crypto','blockchain','defi','nft','web3','solana','coinbase','token','wallet','mining']},
 ];
+
+// ── Publicaciones del sitio ──────────────────────────────────────────────────
+// Para agregar una entrada: copia el bloque { } y edita los campos.
+const POSTS=[
+  {
+    id:1,
+    title:'Bienvenidos a Nuxiens',
+    date:'30 de abril, 2025',
+    excerpt:'Nuxiens nace con la misión de acercar la información tecnológica más relevante a Latinoamérica. Somos un agregador de noticias curado por la comunidad, sin anuncios y sin agenda editorial. Gracias por ser parte de esto.',
+    url:null
+  },
+];
+
+function BlogPost({post}){
+  return h('article',{className:'nx-blog-post'},
+    h('div',{className:'nx-blog-date'},post.date),
+    h('h2',{className:'nx-blog-title'},post.title),
+    h('p',{className:'nx-blog-excerpt'},post.excerpt),
+    post.url&&h('a',{className:'nx-blog-link',href:post.url,target:'_blank',rel:'noopener'},'Leer más →')
+  );
+}
 
 function getTags(title){
   if(!title)return[];
@@ -298,6 +328,7 @@ function App(){
   },[trans]);
 
   useEffect(()=>{
+    if(tab==='blog')return;
     setLoading(true);setItems([]);setTrans({});setAllIds([]);setNewIds(new Set());setPage(1);setActiveFilters(new Set());
     fetchIds(tab,new Set())
       .then(ids=>fetchPage(ids,1))
@@ -434,7 +465,13 @@ function App(){
       activeFilters.size>0&&h('span',{className:'nx-filter-result'},filteredItems.length+' result'+(filteredItems.length!==1?'s':''))
     ),
 
-    loading
+    tab==='blog'
+      ?h('div',{className:'nx-list'},
+          POSTS.length===0
+            ?h('div',{className:'nx-empty'},'No hay publicaciones aún.')
+            :POSTS.map(p=>h(BlogPost,{key:p.id,post:p}))
+        )
+      :loading
       ?h('ul',{className:'nx-list'},skels.map(i=>
           h('li',{key:i,className:'nx-item'},
             h('div',{className:'nx-rank',style:{opacity:.2}},i+1),
@@ -467,7 +504,8 @@ function App(){
     h('div',{className:'nx-foot'},
       h('span',{className:'nx-foot-txt'},'auto-refresh 60s'+(items.length?' · '+items.length+' loaded':'')),
       h('span',{className:'nx-foot-txt'},'© 2025 nuxiens.org'),
-      h('span',{className:'nx-foot-txt',style:{marginTop:4,display:'block',opacity:.6}},'Agradecemos sinceramente el apoyo de TNY Holdings, las comunidades tecnológicas de Latinoamérica y todos los colaboradores y lectores que hacen posible este proyecto.')
+      h('span',{className:'nx-foot-txt',style:{marginTop:4,display:'block',opacity:.6}},'Agradecemos sinceramente el apoyo de TNY Holdings, las comunidades tecnológicas de Latinoamérica y todos los colaboradores y lectores que hacen posible este proyecto.'),
+      h('button',{className:'nx-foot-donate',onClick:()=>window.open('https://nuxiens.org/donar','_blank')},'♥ donar')
     )
   );
 }
