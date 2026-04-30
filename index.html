@@ -188,14 +188,26 @@ const POSTS=[
   },
 ];
 
-function BlogPost({post}){
-  const content=post.body||post.excerpt;
-  const paragraphs=content.split('\n\n').filter(Boolean);
-  return h('article',{className:'nx-blog-post'},
-    h('div',{className:'nx-blog-date'},post.date),
-    h('h2',{className:'nx-blog-title'},post.title),
-    ...paragraphs.map((p,i)=>h('p',{key:i,className:'nx-blog-excerpt',style:{marginTop:i>0?12:0}},p)),
-    post.url&&h('a',{className:'nx-blog-link',href:post.url,target:'_blank',rel:'noopener'},'Leer más →')
+function BlogPost({post,rank}){
+  const[open,setOpen]=useState(false);
+  const paragraphs=(post.body||'').split('\n\n').filter(Boolean);
+  return h('li',{className:'nx-item',style:{display:'grid',gridTemplateColumns:'44px 1fr'}},
+    h('div',{className:'nx-rank'},rank),
+    h('div',{className:'nx-body-col'},
+      h('div',{className:'nx-title-row'},
+        h('span',{className:'nx-ttl',style:{cursor:'pointer'},onClick:()=>setOpen(o=>!o)},post.title),
+        h('span',{className:'nx-domain'},post.date)
+      ),
+      h('p',{className:'nx-ttl-translated',style:{display:'block',marginTop:4}},post.excerpt),
+      open&&paragraphs.length>0&&h('div',{style:{marginTop:12,borderTop:'1px solid var(--border)',paddingTop:12}},
+        paragraphs.map((p,i)=>h('p',{key:i,style:{fontSize:13,color:'var(--text2)',lineHeight:1.75,marginTop:i>0?12:0}},p))
+      ),
+      h('div',{className:'nx-meta',style:{marginTop:6}},
+        h('span',{style:{cursor:'pointer',color:'var(--accent)',fontFamily:'var(--mono)',fontSize:10},onClick:()=>setOpen(o=>!o)},
+          open?'cerrar ↑':'leer más ↓'
+        )
+      )
+    )
   );
 }
 
@@ -477,10 +489,10 @@ function App(){
     ),
 
     tab==='blog'
-      ?h('div',{className:'nx-list'},
+      ?h('ul',{className:'nx-list'},
           POSTS.length===0
             ?h('div',{className:'nx-empty'},'No hay publicaciones aún.')
-            :POSTS.map(p=>h(BlogPost,{key:p.id,post:p}))
+            :POSTS.map((p,i)=>h(BlogPost,{key:p.id,post:p,rank:i+1}))
         )
       :loading
       ?h('ul',{className:'nx-list'},skels.map(i=>
