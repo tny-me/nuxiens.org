@@ -434,10 +434,7 @@ function StoryModal({item,translation,dark,onClose}){
         ),
         h('div',{className:'nx-modal-meta'},
           d&&h('div',{className:'nx-modal-meta-row'},
-            h('span',null,'fuente'),h('span',{className:'nx-modal-meta-val'},d)
-          ),
-          h('div',{className:'nx-modal-meta-row'},
-            h('span',null,'autor'),h('span',{className:'nx-modal-meta-val'},item.by||'—')
+            h('span',null,'fuente'),h('span',{className:'nx-modal-meta-val',style:{color:'var(--text)',fontSize:12}},d)
           ),
           h('div',{className:'nx-modal-meta-row'},
             h('span',null,'publicado'),h('span',{className:'nx-modal-meta-val'},ago(item.time)+' atrás')
@@ -478,8 +475,6 @@ function Row({item,rank,isNew,translation,onTagClick,dark,lang}){
       ),
       h('div',{className:'nx-meta'},
         h('span',{className:'nx-meta-pts'},pts+' pts'),
-        h('span',{className:'nx-meta-sep'},'·'),
-        h('span',null,item.by),
         h('span',{className:'nx-meta-sep'},'·'),
         h('span',null,ago(item.time)),
         momentum&&h('span',{className:'nx-meta-sep'},'·'),
