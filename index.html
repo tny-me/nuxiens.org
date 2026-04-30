@@ -328,7 +328,7 @@ function getMomentum(score,time){
   const h=Math.max(0.5,(Date.now()/1000-time)/3600);
   if(h>72)return null;
   const v=score/h;
-  if(v>=50)return{label:'🔥 Viral',val:Math.round(v),color:'#DC2626'};
+  if(v>=50)return{label:'▲▲ Viral',val:Math.round(v),color:'#DC2626'};
   if(v>=10)return{label:'↑ Tendencia',val:Math.round(v),color:'#D97706'};
   if(v>=3)return{label:'~ Subiendo',val:Math.round(v),color:'#0369A1'};
   return null;
