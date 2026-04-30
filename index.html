@@ -549,7 +549,7 @@ function App(){
       ?h('ul',{className:'nx-list'},
           POSTS.length===0
             ?h('div',{className:'nx-empty'},'No hay publicaciones aún.')
-            :POSTS.slice().reverse().map((p,i)=>h(BlogPost,{key:p.id,post:p,rank:i+1}))
+            :POSTS.map((p,i)=>h(BlogPost,{key:p.id,post:p,rank:i+1}))
         )
       :loading
       ?h('ul',{className:'nx-list'},skels.map(i=>
