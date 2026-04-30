@@ -139,7 +139,7 @@
 const {useState,useEffect,useRef,useCallback,useMemo}=React;
 const h=React.createElement;
 const BASE='https://hacker-news.firebaseio.com/v0';
-const TABS=[{id:'top',label:'top'},{id:'new',label:'new'},{id:'blog',label:'blog'}];
+const TABS=[{id:'top',label:'top'},{id:'new',label:'new'},{id:'blog',label:'press'}];
 const EP={top:'topstories',new:'newstories'};
 const PAGE=30;
 
@@ -549,7 +549,7 @@ function App(){
       ?h('ul',{className:'nx-list'},
           POSTS.length===0
             ?h('div',{className:'nx-empty'},'No hay publicaciones aún.')
-            :POSTS.map((p,i)=>h(BlogPost,{key:p.id,post:p,rank:i+1}))
+            :POSTS.slice().reverse().map((p,i)=>h(BlogPost,{key:p.id,post:p,rank:i+1}))
         )
       :loading
       ?h('ul',{className:'nx-list'},skels.map(i=>
