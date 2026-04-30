@@ -323,18 +323,16 @@ async function fetchLatamItems(){
   return all.flat().sort((a,b)=>b.time-a.time).slice(0,12);
 }
 
-const WHY_LATAM={
-  'AI':'La IA está redefiniendo el mercado laboral en LATAM, donde millones de empleos son automatizables.',
-  'security':'La ciberseguridad es crítica para empresas y gobiernos latinoamericanos en plena digitalización.',
-  'startup':'El ecosistema startup en México y LATAM está en auge; esto impacta directamente a fundadores de la región.',
-  'code':'El desarrollo de software es uno de los sectores con mayor demanda de talento en LATAM.',
-  'science':'Comprender las tendencias científicas globales es clave para investigadores y académicos de la región.',
-  'business':'Las decisiones de grandes corporaciones impactan mercados y empleos en toda Latinoamérica.',
-  'hardware':'La dependencia de semiconductores es un punto estratégico para la industria tech de LATAM.',
-  'web':'El desarrollo web impulsa la economía digital latinoamericana, el mercado de mayor crecimiento en e-commerce.',
-  'crypto':'LATAM lidera la adopción de cripto globalmente como respuesta a la inflación y la exclusión financiera.',
-};
-function getWhyLatam(tags){for(const t of tags){if(WHY_LATAM[t])return WHY_LATAM[t];}return null;}
+function getMomentum(score,time){
+  if(!score||score<5)return null;
+  const h=Math.max(0.5,(Date.now()/1000-time)/3600);
+  if(h>72)return null;
+  const v=score/h;
+  if(v>=50)return{label:'🔥 Viral',val:Math.round(v),color:'#DC2626'};
+  if(v>=10)return{label:'↑ Tendencia',val:Math.round(v),color:'#D97706'};
+  if(v>=3)return{label:'~ Subiendo',val:Math.round(v),color:'#0369A1'};
+  return null;
+}
 async function translateBatch(titles,lang){
   if(lang==='en')return titles;
   const tl=GT_LANG[lang]||lang;
@@ -369,7 +367,7 @@ function Row({item,rank,isNew,translation,onTagClick,dark,lang}){
   const commentsUrl=`https://news.ycombinator.com/item?id=${item.id}`;
   const articleHref=item.url||commentsUrl;
   const displayTitle=translation||item.title;
-  const why=getWhyLatam(tags);
+  const momentum=getMomentum(item.score,item.time);
   return h('li',{className:`nx-item${isNew?' isnew':''}`},
     h('div',{className:'nx-rank'},rank),
     h('div',{className:'nx-vote-col'},
@@ -384,16 +382,14 @@ function Row({item,rank,isNew,translation,onTagClick,dark,lang}){
         item.isLatam&&h('span',{className:'nx-tag',style:{background:'#064E3B',color:'#6EE7B7',borderColor:'#065F4644'}},'LATAM'),
         ...tags.map(t=>h(TagPill,{key:t,tag:t,active:false,onClick:onTagClick,dark}))
       ),
-      why&&h('p',{style:{fontSize:11,color:'var(--text3)',marginTop:4,lineHeight:1.5,fontStyle:'italic'}},
-        h('span',{style:{color:'var(--accent)',fontWeight:500,fontStyle:'normal'}},'¿Por qué importa? '),why
-      ),
       h('div',{className:'nx-meta'},
         h('span',{className:'nx-meta-pts'},pts+' pts'),
         h('span',{className:'nx-meta-sep'},'·'),
         h('span',null,item.by),
         h('span',{className:'nx-meta-sep'},'·'),
         h('span',null,ago(item.time)),
-        null
+        momentum&&h('span',{className:'nx-meta-sep'},'·'),
+        momentum&&h('span',{style:{color:momentum.color,fontWeight:500}},`${momentum.label} · ${momentum.val}pts/h`)
       )
     )
   );
