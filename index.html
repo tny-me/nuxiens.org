@@ -358,9 +358,9 @@ async function translateBatch(titles,lang){
 
 function Destacados({items,trans,lang}){
   const top=useMemo(()=>
-    [...items].filter(i=>!i.isLatam&&i.score>0).sort((a,b)=>b.score-a.score).slice(0,3)
+    [...items].filter(i=>!i.isLatam&&i.score>0).sort((a,b)=>b.score-a.score).slice(0,5)
   ,[items]);
-  if(top.length<2)return null;
+  if(top.length<3)return null;
   return h('div',{className:'nx-highlight-bar'},
     h('span',{className:'nx-highlight-label'},'★ destacados'),
     top.map(item=>{
