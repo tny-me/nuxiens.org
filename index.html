@@ -208,15 +208,17 @@ const LANGS=[
 const LANG_NAMES={en:'English',es:'español',fr:'français',de:'Deutsch',pt:'português',zh:'中文',ja:'日本語'};
 
 const TAGS=[
-  {tag:'AI',color:'#7C3AED',bg:'#F5F3FF',dbg:'#2D1B69',kw:['ai','artificial intelligence','gpt','llm','machine learning','ml','openai','claude','gemini','mistral','anthropic','deepmind','neural','diffusion','transformer','chatbot','copilot','inference','training','deep learning','language model']},
-  {tag:'security',color:'#DC2626',bg:'#FEF2F2',dbg:'#450A0A',kw:['security','vulnerability','exploit','breach','hack','malware','ransomware','phishing','cve','zero-day','encryption','privacy','surveillance','leak','attack','threat','backdoor','bug bounty']},
-  {tag:'code',color:'#0369A1',bg:'#F0F9FF',dbg:'#0C1A2E',kw:['rust','python','javascript','typescript','golang','java','c++','compiler','framework','library','open source','github','npm','package','api','sdk','cli','linux','kernel','programming','software']},
-  {tag:'startup',color:'#B45309',bg:'#FFFBEB',dbg:'#271A00',kw:['startup','funding','vc','venture','series a','series b','valuation','acquisition','ipo','founder','yc','y combinator','raise','unicorn','seed round']},
+  {tag:'AI',color:'#7C3AED',bg:'#F5F3FF',dbg:'#2D1B69',kw:['ai','artificial intelligence','gpt','llm','machine learning','ml','openai','claude','gemini','mistral','anthropic','deepmind','neural','diffusion','transformer','chatbot','copilot','inference','training','deep learning','language model','inteligencia artificial','modelo de lenguaje']},
+  {tag:'innovación',color:'#0891B2',bg:'#ECFEFF',dbg:'#0A2830',kw:['innovation','innovación','innovacion','breakthrough','disruptive','disrupción','next-gen','cutting-edge','pioneering','revoluciona','revolucionario','transforma','transformación','futuro','future','avance','avances','adelanto','emerging','tecnología emergente']},
+  {tag:'educación',color:'#7C3AED',bg:'#F5F3FF',dbg:'#2D1B69',kw:['education','educación','educacion','learning','aprendizaje','university','universidad','school','escuela','course','curso','mooc','student','estudiante','teacher','maestro','docente','research','knowledge','conocimiento','bootcamp','scholarship','beca','enseñanza','ciencia abierta','open access']},
+  {tag:'security',color:'#DC2626',bg:'#FEF2F2',dbg:'#450A0A',kw:['security','vulnerability','exploit','breach','hack','malware','ransomware','phishing','cve','zero-day','encryption','privacy','surveillance','leak','attack','threat','backdoor','bug bounty','ciberseguridad','seguridad']},
+  {tag:'code',color:'#0369A1',bg:'#F0F9FF',dbg:'#0C1A2E',kw:['rust','python','javascript','typescript','golang','java','c++','compiler','framework','library','open source','github','npm','package','api','sdk','cli','linux','kernel','programming','software','código','programación']},
+  {tag:'startup',color:'#B45309',bg:'#FFFBEB',dbg:'#271A00',kw:['startup','funding','vc','venture','series a','series b','valuation','acquisition','ipo','founder','yc','y combinator','raise','unicorn','seed round','emprendimiento','emprendedor','inversión','ronda','capital']},
   {tag:'web',color:'#0F766E',bg:'#F0FDFA',dbg:'#0A2926',kw:['browser','chrome','firefox','html','css','react','vue','nextjs','wasm','http','frontend','backend','cloudflare','vercel','cdn','web','svelte','astro']},
-  {tag:'hardware',color:'#6D28D9',bg:'#FAF5FF',dbg:'#1E0A3C',kw:['chip','cpu','gpu','nvidia','amd','intel','apple silicon','arm','quantum','robot','drone','hardware','semiconductor','tsmc','memory','storage']},
-  {tag:'science',color:'#15803D',bg:'#F0FDF4',dbg:'#0A2018',kw:['research','study','paper','science','physics','biology','chemistry','space','nasa','climate','energy','medicine','health','gene','protein','experiment','discovery']},
-  {tag:'business',color:'#1D4ED8',bg:'#EFF6FF',dbg:'#0A1628',kw:['google','apple','meta','microsoft','amazon','tesla','twitter','tiktok','netflix','layoff','employee','ceo','revenue','profit','market','stock','antitrust','regulation']},
-  {tag:'crypto',color:'#D97706',bg:'#FFFBEB',dbg:'#2A1A00',kw:['bitcoin','ethereum','crypto','blockchain','defi','nft','web3','solana','coinbase','token','wallet','mining']},
+  {tag:'hardware',color:'#6D28D9',bg:'#FAF5FF',dbg:'#1E0A3C',kw:['chip','cpu','gpu','nvidia','amd','intel','apple silicon','arm','quantum','robot','drone','hardware','semiconductor','tsmc','memory','storage','procesador','computadora']},
+  {tag:'ciencia',color:'#15803D',bg:'#F0FDF4',dbg:'#0A2018',kw:['research','study','paper','science','ciencia','physics','biology','chemistry','space','nasa','climate','energy','medicine','health','gene','protein','experiment','discovery','espacio','salud','medicina','descubrimiento','investigación']},
+  {tag:'negocios',color:'#1D4ED8',bg:'#EFF6FF',dbg:'#0A1628',kw:['google','apple','meta','microsoft','amazon','tesla','twitter','tiktok','netflix','layoff','employee','ceo','revenue','profit','market','stock','antitrust','regulation','negocios','empresa','negocio','economía','economia','finanzas','mercado','inversión']},
+  {tag:'crypto',color:'#D97706',bg:'#FFFBEB',dbg:'#2A1A00',kw:['bitcoin','ethereum','crypto','blockchain','defi','nft','web3','solana','coinbase','token','wallet','mining','criptomoneda','cripto']},
 ];
 
 // ── Publicaciones del sitio ──────────────────────────────────────────────────
@@ -340,26 +342,56 @@ function fmtCd(s){return s>=60?`${Math.floor(s/60)}m ${s%60}s`:`${s}s`;}
 const GT_LANG={zh:'zh-CN',pt:'pt',ja:'ja',fr:'fr',de:'de',es:'es'};
 
 const LATAM_FEEDS=[
+  // Tecnología
   {url:'https://www.xataka.com.mx/feed',source:'Xataka MX'},
+  {url:'https://www.xataka.com/feed',source:'Xataka'},
+  {url:'https://www.genbeta.com/rss',source:'Genbeta'},
   {url:'https://hipertextual.com/feed',source:'Hipertextual'},
   {url:'https://www.fayerwayer.com/feed/',source:'FayerWayer'},
   {url:'https://www.enter.co/feed/',source:'Enter.co'},
+  // Ciencia e innovación
+  {url:'https://www.technologyreview.es/feed',source:'MIT Tech Review ES'},
+  {url:'https://feeds.bbci.co.uk/mundo/ciencia_y_tecnologia/rss.xml',source:'BBC Ciencia'},
+  {url:'https://www.nationalgeographic.es/rss/ciencia',source:'Nat Geo ES'},
+  // Negocios y emprendimiento
+  {url:'https://expansion.mx/tecnologia/rss',source:'Expansión Tech'},
+  {url:'https://www.forbes.com.mx/feed/',source:'Forbes MX'},
+  {url:'https://www.eleconomista.com.mx/tecnologia/rss',source:'El Economista MX'},
 ];
+
+// Palabras clave que bloquean una historia del feed
+const BLOCK_KW=[
+  'muerte','muerto','muertos','asesinato','asesinado','asesinaron','homicidio',
+  'violencia','violento','crimen','criminal','narco','narcotráfico','narcotraficante',
+  'secuestro','secuestrado','robo','asalto','tiroteo','masacre','matanza',
+  'feminicidio','desaparecido','desaparecidos','extorsión','extorsion',
+  'guerra','atentado','terrorismo','terrorista','bomba','explosión','explosion',
+  'accidente','tragedia','desastre','inundación','terremoto','catástrofe',
+  'escándalo','corrupción','corrupcion','fraude','estafa','preso','detenido',
+];
+function isBlocked(title){
+  if(!title)return false;
+  const low=title.toLowerCase();
+  return BLOCK_KW.some(k=>low.includes(k));
+}
+
 async function fetchLatamItems(){
   const all=await Promise.all(LATAM_FEEDS.map(async({url,source})=>{
     try{
-      const r=await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=8`);
+      const r=await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=10`);
       const d=await r.json();
       if(d.status!=='ok')return[];
-      return d.items.map(item=>({
-        id:'latam_'+btoa(encodeURIComponent(item.link)).slice(0,14),
-        title:item.title,url:item.link,by:source,
-        time:Math.floor(new Date(item.pubDate).getTime()/1000),
-        score:0,descendants:0,isLatam:true,
-      }));
+      return d.items
+        .filter(item=>!isBlocked(item.title))
+        .map(item=>({
+          id:'latam_'+btoa(encodeURIComponent(item.link)).slice(0,14),
+          title:item.title,url:item.link,by:source,
+          time:Math.floor(new Date(item.pubDate).getTime()/1000),
+          score:0,descendants:0,isLatam:true,
+        }));
     }catch(e){return[];}
   }));
-  return all.flat().sort((a,b)=>b.time-a.time).slice(0,12);
+  return all.flat().sort((a,b)=>b.time-a.time).slice(0,24);
 }
 
 function wrapText(ctx,text,x,y,maxW,lh,max){
