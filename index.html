@@ -528,7 +528,7 @@ function StoryModal({item,translation,dark,onClose}){
             h('span',null,'tendencia'),h('span',{className:'nx-modal-meta-val',style:{color:m.color}},`${m.label} · ${m.val}pts/h`)
           )
         ),
-        h('a',{className:'nx-modal-btn',href:item.url||`https://news.ycombinator.com/item?id=${item.id}`,target:'_blank',rel:'noopener'},'Abrir artículo →'),
+        h('a',{className:'nx-modal-btn',href:`https://nuxiens.org/go?url=${encodeURIComponent(item.url||'https://news.ycombinator.com/item?id='+item.id)}`,target:'_blank',rel:'noopener'},'Abrir artículo →'),
         h('button',{className:'nx-modal-btn-sec',onClick:async()=>{
           const imgDataUrl=generateShareImage(item,displayTitle,tags,m);
           const articleUrl=item.url||`https://news.ycombinator.com/item?id=${item.id}`;
