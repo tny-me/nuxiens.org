@@ -138,26 +138,28 @@
 .nx-highlight-title{font-size:11px;color:var(--text);line-height:1.45;font-weight:500;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .nx-highlight-meta{font-family:var(--mono);font-size:9px;color:var(--text3)}
 @media(max-width:620px){.nx-highlight-bar{padding:10px 12px}}
-.nx-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
-.nx-modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.4)}
-.nx-modal-header{background:var(--border);padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.nx-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.nx-modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:100%;max-width:400px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.5)}
+.nx-modal-accent{height:5px;background:linear-gradient(90deg,#B31B1B,#E05252)}
+.nx-modal-header{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
 .nx-modal-logo{display:flex;align-items:center;gap:7px}
-.nx-modal-logo-box{width:20px;height:20px;border-radius:3px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:500;color:#fff}
-.nx-modal-logo-name{font-size:12px;font-weight:500;color:var(--text);letter-spacing:-.2px}
+.nx-modal-logo-box{width:22px;height:22px;border-radius:4px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:500;color:#fff}
+.nx-modal-logo-name{font-size:13px;font-weight:500;color:var(--text);letter-spacing:-.2px}
 .nx-modal-logo-url{font-family:var(--mono);font-size:9px;color:var(--text3);margin-left:4px}
-.nx-modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;line-height:1;padding:2px 6px;transition:color .15s}
-.nx-modal-close:hover{color:var(--text)}
-.nx-modal-body{padding:20px}
-.nx-modal-score{font-family:var(--mono);font-size:36px;font-weight:500;color:var(--accent);line-height:1;margin-bottom:2px}
-.nx-modal-score-label{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.4px;text-transform:uppercase;margin-bottom:14px}
-.nx-modal-title{font-size:16px;font-weight:500;color:var(--text);line-height:1.55;margin-bottom:14px}
-.nx-modal-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
-.nx-modal-meta{font-family:var(--mono);font-size:10px;color:var(--text3);display:flex;flex-direction:column;gap:6px;padding:12px;background:var(--bg);border-radius:6px;margin-bottom:16px}
-.nx-modal-meta-row{display:flex;justify-content:space-between}
+.nx-modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;line-height:1;padding:2px 6px;transition:color .15s;border-radius:4px}
+.nx-modal-close:hover{color:var(--text);background:var(--border)}
+.nx-modal-body{padding:22px 20px 18px}
+.nx-modal-score-wrap{display:flex;align-items:baseline;gap:8px;margin-bottom:16px}
+.nx-modal-score{font-family:var(--mono);font-size:52px;font-weight:500;color:var(--accent);line-height:1}
+.nx-modal-score-sub{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;line-height:1.4}
+.nx-modal-title{font-size:17px;font-weight:500;color:var(--text);line-height:1.55;margin-bottom:16px}
+.nx-modal-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.nx-modal-meta{font-family:var(--mono);font-size:10px;color:var(--text3);display:flex;flex-direction:column;gap:7px;padding:14px;background:var(--bg);border-radius:8px;margin-bottom:16px;border:1px solid var(--border)}
+.nx-modal-meta-row{display:flex;justify-content:space-between;align-items:center}
 .nx-modal-meta-val{color:var(--text2);font-weight:500}
-.nx-modal-btn{display:block;width:100%;padding:11px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-family:var(--mono);font-size:11px;letter-spacing:.4px;cursor:pointer;transition:background .15s;text-align:center;text-decoration:none}
-.nx-modal-btn:hover{background:#991515}
-.nx-modal-foot{padding:10px 20px;border-top:1px solid var(--border);text-align:center;font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.3px;background:var(--bg)}
+.nx-modal-btn{display:block;width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:var(--mono);font-size:11px;letter-spacing:.5px;cursor:pointer;transition:background .15s,transform .1s;text-align:center;text-decoration:none;font-weight:500}
+.nx-modal-btn:hover{background:#991515;transform:translateY(-1px)}
+.nx-modal-foot{padding:11px 20px;border-top:1px solid var(--border);text-align:center;font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.4px;background:var(--bg)}
 .nx-foot{background:var(--nav);border-top:1px solid rgba(255,255,255,.07);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
 .nx-foot-txt{font-family:var(--mono);font-size:9px;color:var(--nav-sub);letter-spacing:.3px}
 
@@ -417,6 +419,7 @@ function StoryModal({item,translation,dark,onClose}){
   },[onClose]);
   return h('div',{className:'nx-overlay',onClick:onClose},
     h('div',{className:'nx-modal','data-dark':dark?'1':undefined,onClick:e=>e.stopPropagation()},
+      h('div',{className:'nx-modal-accent'}),
       h('div',{className:'nx-modal-header'},
         h('div',{className:'nx-modal-logo'},
           h('div',{className:'nx-modal-logo-box'},'N'),
@@ -426,8 +429,10 @@ function StoryModal({item,translation,dark,onClose}){
         h('button',{className:'nx-modal-close',onClick:onClose},'×')
       ),
       h('div',{className:'nx-modal-body'},
-        h('div',{className:'nx-modal-score'},item.score||0),
-        h('div',{className:'nx-modal-score-label'},'puntos en la comunidad'),
+        h('div',{className:'nx-modal-score-wrap'},
+          h('div',{className:'nx-modal-score'},item.score||0),
+          h('div',{className:'nx-modal-score-sub'},'puntos en\nla comunidad')
+        ),
         h('div',{className:'nx-modal-title'},displayTitle),
         tags.length>0&&h('div',{className:'nx-modal-tags'},
           tags.map(t=>h(TagPill,{key:t,tag:t,active:false,dark}))
