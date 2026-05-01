@@ -159,6 +159,8 @@
 .nx-modal-meta-val{color:var(--text2);font-weight:500}
 .nx-modal-btn{display:block;width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:var(--mono);font-size:11px;letter-spacing:.5px;cursor:pointer;transition:background .15s,transform .1s;text-align:center;text-decoration:none;font-weight:500}
 .nx-modal-btn:hover{background:#991515;transform:translateY(-1px)}
+.nx-modal-btn-sec{display:block;width:100%;padding:11px;background:none;color:var(--text2);border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:11px;letter-spacing:.5px;cursor:pointer;transition:all .15s;text-align:center;margin-top:8px}
+.nx-modal-btn-sec:hover{border-color:var(--text);color:var(--text)}
 .nx-modal-foot{padding:11px 20px;border-top:1px solid var(--border);text-align:center;font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:.4px;background:var(--bg)}
 .nx-foot{background:var(--nav);border-top:1px solid rgba(255,255,255,.07);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
 .nx-foot-txt{font-family:var(--mono);font-size:9px;color:var(--nav-sub);letter-spacing:.3px}
@@ -352,6 +354,72 @@ async function fetchLatamItems(){
   return all.flat().sort((a,b)=>b.time-a.time).slice(0,12);
 }
 
+}
+
+function wrapText(ctx,text,x,y,maxW,lh,max){
+  const words=text.split(' ');let line='',ly=y,n=0;
+  for(const w of words){
+    const test=line+w+' ';
+    if(ctx.measureText(test).width>maxW&&line){
+      if(n>=max-1){ctx.fillText(line.trimEnd()+'…',x,ly);return ly;}
+      ctx.fillText(line.trim(),x,ly);line=w+' ';ly+=lh;n++;
+    }else line=test;
+  }
+  ctx.fillText(line.trim(),x,ly);return ly;
+}
+function rrect(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+}
+function generateShareImage(item,displayTitle,momentum){
+  const W=1080,H=1080,P=72;
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const c=cv.getContext('2d');
+  // bg
+  c.fillStyle='#0E0E0E';c.fillRect(0,0,W,H);
+  // grid
+  c.strokeStyle='rgba(255,255,255,0.03)';c.lineWidth=1;
+  for(let x=0;x<W;x+=60){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}
+  for(let y=0;y<H;y+=60){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}
+  // top bar gradient
+  const g=c.createLinearGradient(0,0,W,0);g.addColorStop(0,'#B31B1B');g.addColorStop(1,'#E05252');
+  c.fillStyle=g;c.fillRect(0,0,W,10);
+  // logo box
+  c.fillStyle='#B31B1B';rrect(c,P,P,64,64,10);c.fill();
+  c.fillStyle='#fff';c.font='bold 32px "Courier New",monospace';
+  c.textAlign='center';c.textBaseline='middle';c.fillText('N',P+32,P+33);
+  // wordmark
+  c.textAlign='left';c.textBaseline='alphabetic';
+  c.fillStyle='#FFFFFF';c.font='600 38px system-ui,sans-serif';c.fillText('Nuxiens',P+80,P+40);
+  c.fillStyle='rgba(255,255,255,0.3)';c.font='22px "Courier New",monospace';c.fillText('nuxiens.org',P+80,P+66);
+  // score
+  c.fillStyle='#B31B1B';c.font='bold 160px "Courier New",monospace';c.textAlign='left';
+  c.fillText(String(item.score||0),P,350);
+  c.fillStyle='rgba(255,255,255,0.28)';c.font='24px "Courier New",monospace';
+  c.fillText('PUNTOS EN LA COMUNIDAD',P,388);
+  // divider
+  c.strokeStyle='rgba(255,255,255,0.08)';c.lineWidth=1;
+  c.beginPath();c.moveTo(P,416);c.lineTo(W-P,416);c.stroke();
+  // title
+  c.fillStyle='#EEEEEE';c.font='500 56px system-ui,sans-serif';
+  const ty=wrapText(c,displayTitle,P,494,W-P*2,72,3);
+  // source + momentum
+  let my=ty+64;
+  const d=dom(item.url);
+  if(d){c.fillStyle='rgba(255,255,255,0.4)';c.font='26px "Courier New",monospace';c.fillText(d,P,my);my+=46;}
+  if(momentum){c.fillStyle=momentum.color;c.font='bold 26px "Courier New",monospace';c.fillText(`${momentum.label} · ${momentum.val}pts/h`,P,my);}
+  // bottom
+  c.strokeStyle='rgba(255,255,255,0.08)';c.lineWidth=1;
+  c.beginPath();c.moveTo(P,H-96);c.lineTo(W-P,H-96);c.stroke();
+  c.fillStyle='rgba(255,255,255,0.18)';c.font='19px "Courier New",monospace';
+  c.textAlign='center';
+  c.fillText('nuxiens.org · open source · destilando el conocimiento global para las mentes de Latinoamérica',W/2,H-52);
+  return cv.toDataURL('image/png');
+}
+
 function getMomentum(score,time){
   if(!score||score<5)return null;
   const h=Math.max(0.5,(Date.now()/1000-time)/3600);
@@ -448,7 +516,12 @@ function StoryModal({item,translation,dark,onClose}){
             h('span',null,'tendencia'),h('span',{className:'nx-modal-meta-val',style:{color:m.color}},`${m.label} · ${m.val}pts/h`)
           )
         ),
-        h('a',{className:'nx-modal-btn',href:item.url||`https://news.ycombinator.com/item?id=${item.id}`,target:'_blank',rel:'noopener'},'Abrir artículo →')
+        h('a',{className:'nx-modal-btn',href:item.url||`https://news.ycombinator.com/item?id=${item.id}`,target:'_blank',rel:'noopener'},'Abrir artículo →'),
+        h('button',{className:'nx-modal-btn-sec',onClick:()=>{
+          const img=generateShareImage(item,displayTitle,m);
+          const a=document.createElement('a');
+          a.href=img;a.download='nuxiens-'+item.id+'.png';a.click();
+        }},'↓ Descargar imagen')
       ),
       h('div',{className:'nx-modal-foot'},'nuxiens.org · open source · destilando el conocimiento global para las mentes de Latinoamérica')
     )
