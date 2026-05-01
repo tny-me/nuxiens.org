@@ -322,7 +322,7 @@ function getTags(title){
   return TAGS.filter(r=>r.kw.some(k=>low.includes(k))).map(r=>r.tag);
 }
 function ago(ts){const s=Math.floor(Date.now()/1000-ts);if(s<60)return s+'s';if(s<3600)return Math.floor(s/60)+'m';if(s<86400)return Math.floor(s/3600)+'h';return Math.floor(s/86400)+'d';}
-function dom(url){if(!url)return null;try{return new URL(url).hostname.replace(/^www\./,'');}catch{return null;}}
+function dom(url){if(!url)return null;try{const h=new URL(url).hostname.replace(/^www\./,'');if(h.includes('ycombinator.com'))return null;return h;}catch{return null;}}
 function fmtCd(s){return s>=60?`${Math.floor(s/60)}m ${s%60}s`:`${s}s`;}
 
 const GT_LANG={zh:'zh-CN',pt:'pt',ja:'ja',fr:'fr',de:'de',es:'es'};
