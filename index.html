@@ -343,12 +343,9 @@ const GT_LANG={zh:'zh-CN',pt:'pt',ja:'ja',fr:'fr',de:'de',es:'es'};
 
 const GNEWS_FEEDS=[
   {url:'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=es&gl=MX&ceid=MX:es',label:'Tecnología'},
-  {url:'https://news.google.com/rss/search?q=inteligencia+artificial+avances+innovación&hl=es&gl=MX&ceid=MX:es',label:'IA & Innovación'},
   {url:'https://news.google.com/rss/headlines/section/topic/SCIENCE?hl=es&gl=MX&ceid=MX:es',label:'Ciencia'},
   {url:'https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=es&gl=MX&ceid=MX:es',label:'Negocios'},
-  {url:'https://news.google.com/rss/search?q=startups+emprendimiento+latinoamerica+inversión&hl=es&gl=MX&ceid=MX:es',label:'Startups LATAM'},
-  {url:'https://news.google.com/rss/search?q=educación+aprendizaje+universidades+innovación+educativa&hl=es&gl=MX&ceid=MX:es',label:'Educación'},
-  {url:'https://news.google.com/rss/search?q=avances+científicos+tecnología+futuro+progreso&hl=es&gl=MX&ceid=MX:es',label:'Avances'},
+  {url:'https://news.google.com/rss/search?q=educación+innovación+avances+latinoamerica&hl=es&gl=MX&ceid=MX:es',label:'LATAM'},
 ];
 
 const BLOCK_KW=[
@@ -372,17 +369,28 @@ function parseGTitle(raw){
   return{title:raw,source:null};
 }
 
+async function fetchRssXml(url){
+  const proxies=[
+    `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  ];
+  for(const proxy of proxies){
+    try{
+      const r=await fetch(proxy,{signal:AbortSignal.timeout(7000)});
+      if(!r.ok)continue;
+      const text=await r.text();
+      if(text.includes('<item')||text.includes('<entry'))return text;
+    }catch(e){}
+  }
+  return null;
+}
 async function fetchGNewsFeed({url,label}){
-  const proxy=`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
   try{
-    const r=await fetch(proxy,{signal:AbortSignal.timeout(10000)});
-    if(!r.ok)return[];
-    const text=await r.text();
+    const text=await fetchRssXml(url);
+    if(!text)return[];
     const xml=new DOMParser().parseFromString(text,'text/xml');
-    const items=[...xml.querySelectorAll('item')];
-    return items.slice(0,12).map(i=>{
+    return[...xml.querySelectorAll('item')].slice(0,10).map(i=>{
       const rawTitle=i.querySelector('title')?.textContent||'';
-      // <link> in RSS is a text node sibling, not an element with textContent in all parsers
       const linkEl=i.getElementsByTagName('link')[0];
       const link=(linkEl?.textContent||linkEl?.getAttribute('href')||'').trim();
       const pubDate=i.querySelector('pubDate')?.textContent||'';
@@ -748,19 +756,29 @@ function App(){
     if(tab==='blog')return;
     setLoading(true);setItems([]);setTrans({});setAllIds([]);setNewIds(new Set());setPage(1);setActiveFilters(new Set());
     fetchIds(tab,new Set())
-      .then(ids=>Promise.all([fetchPage(ids,1),fetchLatamItems()]))
-      .then(([hnData,latamData])=>{
-        const merged=[...latamData,...hnData];
-        setItems(merged);setLoading(false);return merged;
+      .then(ids=>fetchPage(ids,1))
+      .then(hnData=>{
+        setItems(hnData);setLoading(false);doTranslate(hnData,lang);
+        // LATAM feeds load in background — no bloquea HN
+        fetchLatamItems().then(latamData=>{
+          if(latamData.length)setItems(prev=>{
+            const hnOnly=prev.filter(i=>!i.isLatam);
+            return[...latamData,...hnOnly];
+          });
+        });
       })
-      .then(data=>doTranslate(data,lang))
       .catch(()=>setLoading(false));
     clearInterval(t1.current);clearInterval(t2.current);
     setCd(60);
     t1.current=setInterval(()=>{
       setCd(60);
       setLastIds(prev=>{
-        fetchIds(tab,prev).then(ids=>Promise.all([fetchPage(ids,1),fetchLatamItems()])).then(([hn,latam])=>{const m=[...latam,...hn];setItems(m);setPage(1);doTranslate(m,lang);});
+        fetchIds(tab,prev).then(ids=>fetchPage(ids,1)).then(hn=>{
+          setItems(hn);setPage(1);doTranslate(hn,lang);
+          fetchLatamItems().then(latam=>{
+            if(latam.length)setItems(p=>[...latam,...p.filter(i=>!i.isLatam)]);
+          });
+        });
         return prev;
       });
     },60000);
