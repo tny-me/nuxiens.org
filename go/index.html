@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nuxiens · Abriendo artículo</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='5' fill='%23B31B1B'/><text x='16' y='23' font-family='monospace' font-size='18' font-weight='500' fill='white' text-anchor='middle'>N</text></svg>">
+
+<!-- OG tags (generic nuxiens branding for link preview) -->
+<meta property="og:site_name" content="Nuxiens">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://nuxiens.org/og.svg">
+<meta property="og:title" content="Nuxiens · Destilando el conocimiento global para Latinoamérica">
+<meta property="og:description" content="Open source · Tecnología · IA · Seguridad · Ciencia · Negocios">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://nuxiens.org/og.svg">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--accent:#B31B1B;--mono:'Courier New',monospace}
+html,body{height:100%;background:#0E0E0E;color:#EEE;font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center}
+
+.wrap{display:flex;flex-direction:column;align-items:center;gap:28px;padding:32px;text-align:center;max-width:520px}
+
+.logo{display:flex;align-items:center;gap:10px}
+.logo-box{width:36px;height:36px;border-radius:6px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-n{font-family:var(--mono);font-size:18px;font-weight:700;color:#fff}
+.logo-name{font-size:17px;font-weight:600;color:#fff;letter-spacing:-.3px}
+
+.bar{width:48px;height:3px;background:var(--accent);border-radius:2px;animation:grow 1.4s ease forwards}
+@keyframes grow{from{width:0;opacity:.4}to{width:200px;opacity:1}}
+
+.msg{font-family:var(--mono);font-size:12px;color:rgba(255,255,255,.4);letter-spacing:.3px;line-height:1.7}
+
+.dest{font-size:12px;color:rgba(255,255,255,.2);font-family:var(--mono);word-break:break-all;max-width:100%}
+
+.skip{margin-top:8px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.18);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.skip:hover{color:rgba(255,255,255,.5)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <div class="logo-box"><span class="logo-n">N</span></div>
+    <span class="logo-name">Nuxiens</span>
+  </div>
+
+  <div class="bar" id="bar"></div>
+
+  <p class="msg">Abriendo artículo desde Nuxiens…</p>
+
+  <p class="dest" id="dest"></p>
+
+  <span class="skip" id="skip">Ir ahora →</span>
+</div>
+
+<script>
+(function(){
+  const params=new URLSearchParams(location.search);
+  const url=params.get('url');
+  const dest=document.getElementById('dest');
+  const skip=document.getElementById('skip');
+
+  if(!url){
+    dest.textContent='No se especificó un artículo.';
+    skip.textContent='← Volver a Nuxiens';
+    skip.onclick=()=>{location.href='/';};
+    return;
+  }
+
+  // show cleaned destination
+  try{dest.textContent=new URL(url).hostname;}catch(e){dest.textContent=url.slice(0,60);}
+
+  skip.onclick=()=>{location.href=url;};
+
+  // auto-redirect after 1.5s
+  setTimeout(()=>{location.href=url;},1500);
+})();
+</script>
+</body>
+</html>

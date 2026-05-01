@@ -532,7 +532,8 @@ function StoryModal({item,translation,dark,onClose}){
         h('button',{className:'nx-modal-btn-sec',onClick:async()=>{
           const imgDataUrl=generateShareImage(item,displayTitle,tags,m);
           const articleUrl=item.url||`https://news.ycombinator.com/item?id=${item.id}`;
-          const shareText=`${displayTitle}\n\nVía nuxiens.org`;
+          const nuxUrl=`https://nuxiens.org/go?url=${encodeURIComponent(articleUrl)}`;
+          const shareText=`${displayTitle}\n\n${nuxUrl}`;
           // try Web Share API with file (works on mobile)
           if(navigator.canShare){
             try{
@@ -540,16 +541,17 @@ function StoryModal({item,translation,dark,onClose}){
               const blob=await res.blob();
               const file=new File([blob],'nuxiens-'+item.id+'.png',{type:'image/png'});
               if(navigator.canShare({files:[file]})){
-                await navigator.share({files:[file],title:displayTitle,text:shareText,url:articleUrl});
+                await navigator.share({files:[file],title:displayTitle,text:shareText});
                 return;
               }
             }catch(e){if(e.name==='AbortError')return;}
           }
-          // fallback: share URL only (desktop browsers that support navigator.share)
+          // fallback: share URL via navigator.share
           if(navigator.share){
-            try{await navigator.share({title:displayTitle,text:shareText,url:articleUrl});return;}catch(e){if(e.name==='AbortError')return;}
+            try{await navigator.share({title:displayTitle,text:displayTitle,url:nuxUrl});return;}catch(e){if(e.name==='AbortError')return;}
           }
-          // last resort: download image
+          // last resort: copy link + download image
+          try{await navigator.clipboard.writeText(nuxUrl);}catch(e){}
           const a=document.createElement('a');
           a.href=imgDataUrl;a.download='nuxiens-'+item.id+'.png';a.click();
         }},'↗ Compartir noticia')
