@@ -336,19 +336,21 @@ function getTags(title){
   return TAGS.filter(r=>r.kw.some(k=>low.includes(k))).map(r=>r.tag);
 }
 function ago(ts){const s=Math.floor(Date.now()/1000-ts);if(s<60)return s+'s';if(s<3600)return Math.floor(s/60)+'m';if(s<86400)return Math.floor(s/3600)+'h';return Math.floor(s/86400)+'d';}
-function dom(url){if(!url)return null;try{const h=new URL(url).hostname.replace(/^www\./,'');if(h.includes('ycombinator.com'))return null;return h;}catch{return null;}}
+function dom(url){if(!url)return null;try{const h=new URL(url).hostname.replace(/^www\./,'');if(h.includes('ycombinator.com')||h.includes('news.google.com'))return null;return h;}catch{return null;}}
 function fmtCd(s){return s>=60?`${Math.floor(s/60)}m ${s%60}s`:`${s}s`;}
 
 const GT_LANG={zh:'zh-CN',pt:'pt',ja:'ja',fr:'fr',de:'de',es:'es'};
 
-const LATAM_FEEDS=[
-  {url:'https://www.xataka.com.mx/feed',source:'Xataka MX'},
-  {url:'https://feeds.bbci.co.uk/mundo/ciencia_y_tecnologia/rss.xml',source:'BBC Ciencia'},
-  {url:'https://elpais.com/rss/elpais/tecnologia.es.rss',source:'El País Tech'},
-  {url:'https://feeds.arstechnica.com/arstechnica/technology-lab',source:'Ars Technica'},
+const GNEWS_FEEDS=[
+  {url:'https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=es&gl=MX&ceid=MX:es',label:'Tecnología'},
+  {url:'https://news.google.com/rss/search?q=inteligencia+artificial+avances+innovación&hl=es&gl=MX&ceid=MX:es',label:'IA & Innovación'},
+  {url:'https://news.google.com/rss/headlines/section/topic/SCIENCE?hl=es&gl=MX&ceid=MX:es',label:'Ciencia'},
+  {url:'https://news.google.com/rss/headlines/section/topic/BUSINESS?hl=es&gl=MX&ceid=MX:es',label:'Negocios'},
+  {url:'https://news.google.com/rss/search?q=startups+emprendimiento+latinoamerica+inversión&hl=es&gl=MX&ceid=MX:es',label:'Startups LATAM'},
+  {url:'https://news.google.com/rss/search?q=educación+aprendizaje+universidades+innovación+educativa&hl=es&gl=MX&ceid=MX:es',label:'Educación'},
+  {url:'https://news.google.com/rss/search?q=avances+científicos+tecnología+futuro+progreso&hl=es&gl=MX&ceid=MX:es',label:'Avances'},
 ];
 
-// Palabras clave que bloquean una historia del feed
 const BLOCK_KW=[
   'muerte','muerto','muertos','asesinato','asesinado','asesinaron','homicidio',
   'violencia','violento','crimen','criminal','narco','narcotráfico','narcotraficante',
@@ -363,36 +365,45 @@ function isBlocked(title){
   const low=title.toLowerCase();
   return BLOCK_KW.some(k=>low.includes(k));
 }
+function parseGTitle(raw){
+  if(!raw)return{title:raw,source:null};
+  const idx=raw.lastIndexOf(' - ');
+  if(idx>10)return{title:raw.slice(0,idx).trim(),source:raw.slice(idx+3).trim()};
+  return{title:raw,source:null};
+}
 
-async function fetchOneRss({url,source}){
-  const api=`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=12&api_key=`;
+async function fetchGNewsFeed({url,label}){
+  const api=`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=12`;
   try{
-    const r=await fetch(api,{signal:AbortSignal.timeout(8000)});
+    const r=await fetch(api,{signal:AbortSignal.timeout(9000)});
     if(!r.ok)return[];
     const d=await r.json();
     if(!d||d.status!=='ok'||!Array.isArray(d.items))return[];
     return d.items
       .filter(i=>i.link&&i.title&&!isBlocked(i.title))
-      .map(i=>({
-        id:'latam_'+btoa(encodeURIComponent(i.link)).slice(0,16),
-        title:i.title.trim(),url:i.link,by:source,
-        time:Math.floor(new Date(i.pubDate).getTime()/1000)||0,
-        score:0,descendants:0,isLatam:true,
-      }));
+      .map(i=>{
+        const{title,source}=parseGTitle(i.title);
+        return{
+          id:'gn_'+btoa(encodeURIComponent(i.link)).slice(0,16),
+          title,url:i.link,by:source||label,
+          time:Math.floor(new Date(i.pubDate).getTime()/1000)||0,
+          score:0,descendants:0,isLatam:true,
+        };
+      });
   }catch(e){return[];}
 }
 async function fetchLatamItems(){
-  const all=await Promise.all(LATAM_FEEDS.map(fetchOneRss));
+  const all=await Promise.all(GNEWS_FEEDS.map(fetchGNewsFeed));
   const seen=new Set();
   return all.flat()
     .filter(item=>{
       if(!item.url||!item.title)return false;
-      const key=item.url.replace(/[?#].*/,'').replace(/\/$/,'').toLowerCase();
+      const key=item.title.toLowerCase().slice(0,40);
       if(seen.has(key))return false;
       seen.add(key);return true;
     })
     .sort((a,b)=>b.time-a.time)
-    .slice(0,20);
+    .slice(0,28);
 }
 
 function wrapText(ctx,text,x,y,maxW,lh,max){
