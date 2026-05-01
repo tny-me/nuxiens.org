@@ -354,8 +354,6 @@ async function fetchLatamItems(){
   return all.flat().sort((a,b)=>b.time-a.time).slice(0,12);
 }
 
-}
-
 function wrapText(ctx,text,x,y,maxW,lh,max){
   const words=text.split(' ');let line='',ly=y,n=0;
   for(const w of words){
