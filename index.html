@@ -373,23 +373,28 @@ function parseGTitle(raw){
 }
 
 async function fetchGNewsFeed({url,label}){
-  const api=`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=12`;
+  const proxy=`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
   try{
-    const r=await fetch(api,{signal:AbortSignal.timeout(9000)});
+    const r=await fetch(proxy,{signal:AbortSignal.timeout(10000)});
     if(!r.ok)return[];
-    const d=await r.json();
-    if(!d||d.status!=='ok'||!Array.isArray(d.items))return[];
-    return d.items
-      .filter(i=>i.link&&i.title&&!isBlocked(i.title))
-      .map(i=>{
-        const{title,source}=parseGTitle(i.title);
-        return{
-          id:'gn_'+btoa(encodeURIComponent(i.link)).slice(0,16),
-          title,url:i.link,by:source||label,
-          time:Math.floor(new Date(i.pubDate).getTime()/1000)||0,
-          score:0,descendants:0,isLatam:true,
-        };
-      });
+    const text=await r.text();
+    const xml=new DOMParser().parseFromString(text,'text/xml');
+    const items=[...xml.querySelectorAll('item')];
+    return items.slice(0,12).map(i=>{
+      const rawTitle=i.querySelector('title')?.textContent||'';
+      // <link> in RSS is a text node sibling, not an element with textContent in all parsers
+      const linkEl=i.getElementsByTagName('link')[0];
+      const link=(linkEl?.textContent||linkEl?.getAttribute('href')||'').trim();
+      const pubDate=i.querySelector('pubDate')?.textContent||'';
+      const{title,source}=parseGTitle(rawTitle);
+      if(!title||isBlocked(title))return null;
+      return{
+        id:'gn_'+btoa(unescape(encodeURIComponent(link||title))).slice(0,16),
+        title,url:link,by:source||label,
+        time:Math.floor(new Date(pubDate).getTime()/1000)||0,
+        score:0,descendants:0,isLatam:true,
+      };
+    }).filter(Boolean);
   }catch(e){return[];}
 }
 async function fetchLatamItems(){
