@@ -342,21 +342,10 @@ function fmtCd(s){return s>=60?`${Math.floor(s/60)}m ${s%60}s`:`${s}s`;}
 const GT_LANG={zh:'zh-CN',pt:'pt',ja:'ja',fr:'fr',de:'de',es:'es'};
 
 const LATAM_FEEDS=[
-  // Tecnología
   {url:'https://www.xataka.com.mx/feed',source:'Xataka MX'},
-  {url:'https://www.xataka.com/feed',source:'Xataka'},
-  {url:'https://www.genbeta.com/rss',source:'Genbeta'},
-  {url:'https://hipertextual.com/feed',source:'Hipertextual'},
-  {url:'https://www.fayerwayer.com/feed/',source:'FayerWayer'},
-  {url:'https://www.enter.co/feed/',source:'Enter.co'},
-  // Ciencia e innovación
   {url:'https://www.technologyreview.es/feed',source:'MIT Tech Review ES'},
   {url:'https://feeds.bbci.co.uk/mundo/ciencia_y_tecnologia/rss.xml',source:'BBC Ciencia'},
-  {url:'https://www.nationalgeographic.es/rss/ciencia',source:'Nat Geo ES'},
-  // Negocios y emprendimiento
-  {url:'https://expansion.mx/tecnologia/rss',source:'Expansión Tech'},
-  {url:'https://www.forbes.com.mx/feed/',source:'Forbes MX'},
-  {url:'https://www.eleconomista.com.mx/tecnologia/rss',source:'El Economista MX'},
+  {url:'https://expansion.mx/tecnologia/rss',source:'Expansión MX'},
 ];
 
 // Palabras clave que bloquean una historia del feed
@@ -378,7 +367,7 @@ function isBlocked(title){
 async function fetchLatamItems(){
   const all=await Promise.all(LATAM_FEEDS.map(async({url,source})=>{
     try{
-      const r=await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=10`);
+      const r=await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=12`);
       const d=await r.json();
       if(d.status!=='ok')return[];
       return d.items
@@ -391,7 +380,16 @@ async function fetchLatamItems(){
         }));
     }catch(e){return[];}
   }));
-  return all.flat().sort((a,b)=>b.time-a.time).slice(0,24);
+  // deduplicate by normalized URL
+  const seen=new Set();
+  return all.flat()
+    .filter(item=>{
+      const key=item.url.replace(/[?#].*/,'').replace(/\/$/,'').toLowerCase();
+      if(seen.has(key))return false;
+      seen.add(key);return true;
+    })
+    .sort((a,b)=>b.time-a.time)
+    .slice(0,20);
 }
 
 function wrapText(ctx,text,x,y,maxW,lh,max){
