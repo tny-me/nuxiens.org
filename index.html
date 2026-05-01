@@ -372,21 +372,35 @@ function rrect(ctx,x,y,w,h,r){
   ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);
   ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
 }
-function generateShareImage(item,displayTitle,momentum){
+function generateShareImage(item,displayTitle,tags,momentum){
   const W=1080,H=1080,P=72;
   const cv=document.createElement('canvas');cv.width=W;cv.height=H;
   const c=cv.getContext('2d');
+  // pick accent color from primary tag
+  const tagMeta=tags&&tags.length>0?TAGS.find(t=>t.tag===tags[0]):null;
+  const accent=tagMeta?tagMeta.color:'#B31B1B';
+  // derive lighter version of accent for gradient end
+  function lightenHex(hex,amt){
+    let n=parseInt(hex.slice(1),16);
+    let r=Math.min(255,((n>>16)&0xff)+amt);
+    let g=Math.min(255,((n>>8)&0xff)+amt);
+    let b=Math.min(255,(n&0xff)+amt);
+    return '#'+(r<<16|g<<8|b).toString(16).padStart(6,'0');
+  }
+  const accentLight=lightenHex(accent,55);
   // bg
   c.fillStyle='#0E0E0E';c.fillRect(0,0,W,H);
+  // subtle tinted overlay
+  c.fillStyle=accent+'14';c.fillRect(0,0,W,H);
   // grid
   c.strokeStyle='rgba(255,255,255,0.03)';c.lineWidth=1;
   for(let x=0;x<W;x+=60){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}
   for(let y=0;y<H;y+=60){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}
   // top bar gradient
-  const g=c.createLinearGradient(0,0,W,0);g.addColorStop(0,'#B31B1B');g.addColorStop(1,'#E05252');
+  const g=c.createLinearGradient(0,0,W,0);g.addColorStop(0,accent);g.addColorStop(1,accentLight);
   c.fillStyle=g;c.fillRect(0,0,W,10);
   // logo box
-  c.fillStyle='#B31B1B';rrect(c,P,P,64,64,10);c.fill();
+  c.fillStyle=accent;rrect(c,P,P,64,64,10);c.fill();
   c.fillStyle='#fff';c.font='bold 32px "Courier New",monospace';
   c.textAlign='center';c.textBaseline='middle';c.fillText('N',P+32,P+33);
   // wordmark
@@ -394,7 +408,7 @@ function generateShareImage(item,displayTitle,momentum){
   c.fillStyle='#FFFFFF';c.font='600 38px system-ui,sans-serif';c.fillText('Nuxiens',P+80,P+40);
   c.fillStyle='rgba(255,255,255,0.3)';c.font='22px "Courier New",monospace';c.fillText('nuxiens.org',P+80,P+66);
   // score
-  c.fillStyle='#B31B1B';c.font='bold 160px "Courier New",monospace';c.textAlign='left';
+  c.fillStyle=accent;c.font='bold 160px "Courier New",monospace';c.textAlign='left';
   c.fillText(String(item.score||0),P,350);
   c.fillStyle='rgba(255,255,255,0.28)';c.font='24px "Courier New",monospace';
   c.fillText('PUNTOS EN LA COMUNIDAD',P,388);
@@ -516,10 +530,10 @@ function StoryModal({item,translation,dark,onClose}){
         ),
         h('a',{className:'nx-modal-btn',href:item.url||`https://news.ycombinator.com/item?id=${item.id}`,target:'_blank',rel:'noopener'},'Abrir artículo →'),
         h('button',{className:'nx-modal-btn-sec',onClick:()=>{
-          const img=generateShareImage(item,displayTitle,m);
+          const img=generateShareImage(item,displayTitle,tags,m);
           const a=document.createElement('a');
           a.href=img;a.download='nuxiens-'+item.id+'.png';a.click();
-        }},'↓ Descargar imagen')
+        }},'↗ Compartir noticia')
       ),
       h('div',{className:'nx-modal-foot'},'nuxiens.org · open source · destilando el conocimiento global para las mentes de Latinoamérica')
     )
