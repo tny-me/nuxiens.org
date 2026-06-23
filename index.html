@@ -14,7 +14,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23B31B1B'/%3E%3Ctext x='32' y='44' font-family='monospace' font-size='32' fill='white' text-anchor='middle'%3EJ%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Source+Serif+4:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -143,45 +143,37 @@ function trackedText(s){
   return (s||'').toUpperCase().split('').join(' ');
 }
 
-function renderSlide(c,W,H,{text,author,accent,dark,index,total,watermark}){
-  const bg=dark?'#0E0E0E':'#FAFAF8';
-  const fg=dark?'#F3F1EC':'#16140F';
-  const fgMuted=dark?'rgba(243,241,236,0.42)':'rgba(22,20,15,0.42)';
+function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
+  const bg=dark?'#000000':'#FFFFFF';
+  const fg=dark?'#F5F5F7':'#1D1D1F';
+  const fgMuted=dark?'rgba(245,245,247,0.45)':'rgba(29,29,31,0.45)';
   c.fillStyle=bg;c.fillRect(0,0,W,H);
   c.textBaseline='alphabetic';
 
-  if(watermark){
-    c.save();
-    c.globalAlpha=dark?0.05:0.045;
-    c.fillStyle=fg;
-    c.font='500 '+Math.round(W*0.62)+'px Inter,sans-serif';
-    c.textAlign='center';c.textBaseline='middle';
-    c.fillText('@',W/2,H/2);
-    c.restore();
-  }
+  const dotR=Math.round(W*0.0065);
+  c.fillStyle=accent;
+  c.beginPath();c.arc(W/2,Math.round(H*0.355),dotR,0,Math.PI*2);c.fill();
 
-  const fontSize=Math.round(W*0.046);
-  const lh=Math.round(fontSize*1.38);
-  const maxW=Math.round(W*0.76);
-  c.font='400 '+fontSize+'px "EB Garamond",Georgia,serif';
+  const fontSize=Math.round(W*0.05);
+  const lh=Math.round(fontSize*1.3);
+  const maxW=Math.round(W*0.78);
+  c.font='600 '+fontSize+'px -apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,sans-serif';
+  try{c.letterSpacing='-1px';}catch(e){}
   c.fillStyle=fg;c.textAlign='center';
   const lines=getLines(c,text,maxW,10);
   const blockH=lines.length*lh;
-  const cy=Math.round(H/2-H*0.03);
+  const cy=Math.round(H/2);
   const startY=cy-blockH/2+lh*0.3;
   lines.forEach((ln,i)=>c.fillText(ln,W/2,startY+i*lh));
+  try{c.letterSpacing='0px';}catch(e){}
 
-  const lineY=startY+blockH+Math.round(fontSize*0.85);
-  c.strokeStyle=accent;c.lineWidth=2;
-  c.beginPath();c.moveTo(W/2-26,lineY);c.lineTo(W/2+26,lineY);c.stroke();
-
-  c.font='500 '+Math.round(fontSize*0.27)+'px Inter,sans-serif';
+  c.font='500 '+Math.round(fontSize*0.26)+'px Inter,sans-serif';
   c.fillStyle=fgMuted;c.textAlign='center';
-  c.fillText(trackedText(author||'jasachz'),W/2,lineY+Math.round(fontSize*0.62));
+  c.fillText(trackedText(author||'jasachz'),W/2,startY+blockH+Math.round(fontSize*0.9));
 
-  c.font='500 '+Math.round(W*0.0125)+'px Inter,sans-serif';
+  c.font='500 '+Math.round(W*0.012)+'px Inter,sans-serif';
   c.fillStyle=fgMuted;c.textAlign='center';
-  c.fillText(trackedText('@jasachz'),W/2,H-Math.round(H*0.045));
+  c.fillText(trackedText('@jasachz'),W/2,H-Math.round(H*0.05));
 
   if(total>1){
     c.font='500 '+Math.round(W*0.013)+'px "JetBrains Mono",monospace';
@@ -193,11 +185,11 @@ function renderSlide(c,W,H,{text,author,accent,dark,index,total,watermark}){
   }
 }
 
-function renderQuoteImage(canvas,{text,author,accent,dark,format,index,total,watermark}){
+function renderQuoteImage(canvas,{text,author,accent,dark,format,index,total}){
   const f=FORMATS.find(x=>x.id===format)||FORMATS[0];
   canvas.width=f.w;canvas.height=f.h;
   const c=canvas.getContext('2d');
-  renderSlide(c,f.w,f.h,{text,author,accent,dark,index:index||0,total:total||1,watermark});
+  renderSlide(c,f.w,f.h,{text,author,accent,dark,index:index||0,total:total||1});
 }
 
 async function renderToBlob(opts){
@@ -215,7 +207,6 @@ function ShareStudio({entry,onClose}){
   const[accent,setAccent]=useState(PALETTE[0]);
   const[imgDark,setImgDark]=useState(true);
   const[format,setFormat]=useState('post');
-  const[watermark,setWatermark]=useState(false);
   const[busy,setBusy]=useState(false);
   const canvasRef=useRef(null);
 
@@ -223,15 +214,15 @@ function ShareStudio({entry,onClose}){
 
   useEffect(()=>{
     if(canvasRef.current)renderQuoteImage(canvasRef.current,{
-      text:currentText,author,accent,dark:imgDark,format,watermark,
+      text:currentText,author,accent,dark:imgDark,format,
       index:mode==='carrusel'?slide:0,total:mode==='carrusel'?fragments.length:1
     });
-  },[currentText,author,accent,imgDark,format,watermark,mode,slide]);
+  },[currentText,author,accent,imgDark,format,mode,slide]);
 
   const filename=(i,n)=>slugify(currentText)+(n>1?'-'+String(i+1).padStart(2,'0'):'')+'.png';
 
   const download=async()=>{
-    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,watermark,index:slide,total:mode==='carrusel'?fragments.length:1});
+    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,index:slide,total:mode==='carrusel'?fragments.length:1});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
     a.href=url;a.download=filename(slide,1);
@@ -240,7 +231,7 @@ function ShareStudio({entry,onClose}){
   };
 
   const share=async()=>{
-    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,watermark,index:slide,total:mode==='carrusel'?fragments.length:1});
+    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,index:slide,total:mode==='carrusel'?fragments.length:1});
     const file=new File([blob],filename(slide,1),{type:'image/png'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
       try{await navigator.share({files:[file],text:currentText});}catch(e){}
@@ -254,7 +245,7 @@ function ShareStudio({entry,onClose}){
     try{
       const zip=new JSZip();
       for(let i=0;i<fragments.length;i++){
-        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,watermark,index:i,total:fragments.length});
+        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,index:i,total:fragments.length});
         zip.file(filename(i,fragments.length),blob);
       }
       const zipBlob=await zip.generateAsync({type:'blob'});
@@ -273,7 +264,7 @@ function ShareStudio({entry,onClose}){
     try{
       const files=[];
       for(let i=0;i<fragments.length;i++){
-        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,watermark,index:i,total:fragments.length});
+        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,index:i,total:fragments.length});
         files.push(new File([blob],filename(i,fragments.length),{type:'image/png'}));
       }
       if(navigator.canShare&&navigator.canShare({files})){
@@ -343,10 +334,6 @@ function ShareStudio({entry,onClose}){
         h('div',{className:'nx-bgrow'},
           h('button',{className:'nx-bgbtn'+(imgDark?' active':''),onClick:()=>setImgDark(true)},'Oscuro'),
           h('button',{className:'nx-bgbtn'+(!imgDark?' active':''),onClick:()=>setImgDark(false)},'Claro')
-        ),
-        h('div',{className:'nx-bgrow'},
-          h('button',{className:'nx-bgbtn'+(!watermark?' active':''),onClick:()=>setWatermark(false)},'Liso'),
-          h('button',{className:'nx-bgbtn'+(watermark?' active':''),onClick:()=>setWatermark(true)},'Marca de agua')
         ),
         mode==='fragmento'
           ?h('div',{className:'nx-studio-actions'},
