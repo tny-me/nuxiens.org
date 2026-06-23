@@ -150,9 +150,9 @@ function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
   c.fillStyle=bg;c.fillRect(0,0,W,H);
   c.textBaseline='alphabetic';
 
-  const fontSize=Math.round(W*0.034);
-  const lh=Math.round(fontSize*1.4);
-  const maxW=Math.round(W*0.7);
+  const fontSize=Math.round(W*0.024);
+  const lh=Math.round(fontSize*1.45);
+  const maxW=Math.round(W*0.62);
   c.font='400 '+fontSize+'px -apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,sans-serif';
   try{c.letterSpacing='-0.3px';}catch(e){}
   c.fillStyle=fg;c.textAlign='center';
