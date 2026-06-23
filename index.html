@@ -150,15 +150,11 @@ function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
   c.fillStyle=bg;c.fillRect(0,0,W,H);
   c.textBaseline='alphabetic';
 
-  const dotR=Math.round(W*0.0065);
-  c.fillStyle=accent;
-  c.beginPath();c.arc(W/2,Math.round(H*0.355),dotR,0,Math.PI*2);c.fill();
-
-  const fontSize=Math.round(W*0.05);
-  const lh=Math.round(fontSize*1.3);
-  const maxW=Math.round(W*0.78);
-  c.font='600 '+fontSize+'px -apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,sans-serif';
-  try{c.letterSpacing='-1px';}catch(e){}
+  const fontSize=Math.round(W*0.034);
+  const lh=Math.round(fontSize*1.4);
+  const maxW=Math.round(W*0.7);
+  c.font='400 '+fontSize+'px -apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,sans-serif';
+  try{c.letterSpacing='-0.3px';}catch(e){}
   c.fillStyle=fg;c.textAlign='center';
   const lines=getLines(c,text,maxW,10);
   const blockH=lines.length*lh;
