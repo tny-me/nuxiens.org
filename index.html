@@ -14,7 +14,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23B31B1B'/%3E%3Ctext x='32' y='44' font-family='monospace' font-size='32' fill='white' text-anchor='middle'%3EJ%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Source+Serif+4:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -79,12 +79,18 @@ footer{max-width:760px;margin:0 auto;padding:32px 24px 60px;border-top:1px solid
 .nx-btn-primary{background:var(--accent);color:#fff}
 .nx-btn-secondary{background:transparent;border:1px solid var(--border)!important;color:var(--text)}
 .nx-close{position:absolute;top:14px;right:14px;border:none;background:transparent;color:var(--text2);font-size:20px;cursor:pointer;line-height:1}
+.nx-slidenav{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px}
+.nx-slidenav button{border:1px solid var(--border);background:var(--surface);color:var(--text);width:30px;height:30px;border-radius:50%;cursor:pointer}
+.nx-slidenav button:disabled{opacity:.3;cursor:default}
+.nx-slidenav span{font-family:var(--mono);font-size:12px;color:var(--text3)}
+.nx-carousel-note{font-family:var(--sans);font-size:13px;color:var(--text2);line-height:1.5;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px}
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
 const{useState,useRef,useMemo,useEffect}=React;
 const h=React.createElement;
@@ -103,36 +109,6 @@ Cada texto que publique aquí podrá convertirse en una imagen para compartir. L
     quote:'Este espacio existe ahora para lo que yo mismo tengo que decir.'
   }
 ];
-
-function wrapText(ctx,text,x,y,maxW,lh,max){
-  const words=text.split(' ');
-  let line='',cy=y,lines=0;
-  for(let i=0;i<words.length;i++){
-    const test=line+words[i]+' ';
-    if(ctx.measureText(test).width>maxW&&line){
-      if(max&&lines>=max-1){
-        ctx.fillText(line.trim()+'…',x,cy);
-        return cy;
-      }
-      ctx.fillText(line.trim(),x,cy);
-      line=words[i]+' ';cy+=lh;lines++;
-    }else{
-      line=test;
-    }
-  }
-  if(line){ctx.fillText(line.trim(),x,cy);cy+=lh;}
-  return cy;
-}
-
-function rrect(ctx,x,y,w,h,r){
-  ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.arcTo(x+w,y,x+w,y+h,r);
-  ctx.arcTo(x+w,y+h,x,y+h,r);
-  ctx.arcTo(x,y+h,x,y,r);
-  ctx.arcTo(x,y,x+w,y,r);
-  ctx.closePath();
-}
 
 function getLines(ctx,text,maxW,max){
   const words=text.split(' ');
@@ -163,106 +139,139 @@ const FORMATS=[
   {id:'reel',label:'Reel / TikTok',w:1080,h:1920}
 ];
 
-function drawBrand(c,x,y,fg,align){
-  c.fillStyle=fg;
-  c.beginPath();c.arc(x+5,y-7,5,0,Math.PI*2);c.fill();
-  c.font='600 20px Inter,sans-serif';c.textAlign=align||'left';c.textBaseline='alphabetic';
-  c.fillText('@jasachz',align==='center'?x+12:x+18,y);
+function trackedText(s){
+  return (s||'').toUpperCase().split('').join(' ');
 }
 
-function renderPost(c,W,H,{quote,author,accent,dark}){
-  const P=84;
-  const bg=dark?'#121110':'#FAFAF8';
-  const fg=dark?'#EDEAE4':'#1A1816';
+function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
+  const bg=dark?'#0E0E0E':'#FAFAF8';
+  const fg=dark?'#F3F1EC':'#16140F';
+  const fgMuted=dark?'rgba(243,241,236,0.42)':'rgba(22,20,15,0.42)';
   c.fillStyle=bg;c.fillRect(0,0,W,H);
-  c.fillStyle=accent;c.fillRect(0,0,W,8);
-  c.fillStyle=accent;c.font='italic 140px Georgia,serif';c.textAlign='left';
-  c.fillText('“',P-14,300);
-  c.fillStyle=fg;c.font='500 46px Georgia,serif';
-  const endY=wrapText(c,quote,P,400,W-P*2,62,8);
-  c.fillStyle=accent;c.font='italic 26px Georgia,serif';
-  c.fillText(author||'@jasachz',P,endY+70);
-  c.strokeStyle=dark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.08)';c.lineWidth=1;
-  c.beginPath();c.moveTo(P,H-110);c.lineTo(W-P,H-110);c.stroke();
-  drawBrand(c,P,H-70,fg,'left');
-}
+  c.textBaseline='alphabetic';
 
-function renderHistoria(c,W,H,{quote,author,accent,dark}){
-  const P=96;
-  const bg=dark?'#121110':'#FAFAF8';
-  const fg=dark?'#EDEAE4':'#1A1816';
-  c.fillStyle=bg;c.fillRect(0,0,W,H);
-  c.fillStyle=accent;c.fillRect(0,0,W,10);
-  c.fillStyle=accent;c.font='italic 160px Georgia,serif';c.textAlign='left';
-  c.fillText('“',P-16,560);
-  c.fillStyle=fg;c.font='500 54px Georgia,serif';
-  const maxW=W-P*2,lh=72;
-  const lines=getLines(c,quote,maxW,9);
+  const fontSize=Math.round(W*0.046);
+  const lh=Math.round(fontSize*1.38);
+  const maxW=Math.round(W*0.76);
+  c.font='400 '+fontSize+'px "EB Garamond",Georgia,serif';
+  c.fillStyle=fg;c.textAlign='center';
+  const lines=getLines(c,text,maxW,10);
   const blockH=lines.length*lh;
-  const startY=960-blockH/2+lh*0.3;
-  lines.forEach((ln,i)=>c.fillText(ln,P,startY+i*lh));
-  c.fillStyle=accent;c.font='italic 30px Georgia,serif';
-  c.fillText(author||'@jasachz',P,startY+blockH+50);
-  drawBrand(c,P,H-150,fg,'left');
-}
-
-function renderReel(c,W,H,{quote,author,accent}){
-  c.fillStyle=accent;c.fillRect(0,0,W,H);
-  c.fillStyle='rgba(255,255,255,0.85)';c.font='italic 120px Georgia,serif';c.textAlign='center';
-  c.fillText('“',W/2,520);
-  c.fillStyle='#fff';c.font='600 58px Georgia,serif';c.textAlign='center';
-  const maxW=W-160,lh=78;
-  const lines=getLines(c,quote,maxW,9);
-  const blockH=lines.length*lh;
-  const startY=960-blockH/2+lh*0.3;
+  const cy=Math.round(H/2-H*0.03);
+  const startY=cy-blockH/2+lh*0.3;
   lines.forEach((ln,i)=>c.fillText(ln,W/2,startY+i*lh));
-  c.font='italic 28px Georgia,serif';c.fillStyle='rgba(255,255,255,0.85)';
-  c.fillText(author||'@jasachz',W/2,startY+blockH+60);
-  drawBrand(c,W/2-50,H-150,'#fff','center');
+
+  const lineY=startY+blockH+Math.round(fontSize*0.85);
+  c.strokeStyle=accent;c.lineWidth=2;
+  c.beginPath();c.moveTo(W/2-26,lineY);c.lineTo(W/2+26,lineY);c.stroke();
+
+  c.font='500 '+Math.round(fontSize*0.27)+'px Inter,sans-serif';
+  c.fillStyle=fgMuted;c.textAlign='center';
+  c.fillText(trackedText(author||'jasachz'),W/2,lineY+Math.round(fontSize*0.62));
+
+  c.font='500 '+Math.round(W*0.0125)+'px Inter,sans-serif';
+  c.fillStyle=fgMuted;c.textAlign='center';
+  c.fillText(trackedText('@jasachz'),W/2,H-Math.round(H*0.045));
+
+  if(total>1){
+    c.font='500 '+Math.round(W*0.013)+'px "JetBrains Mono",monospace';
+    c.fillStyle=fgMuted;c.textAlign='right';
+    c.fillText(
+      String(index+1).padStart(2,'0')+' / '+String(total).padStart(2,'0'),
+      W-Math.round(W*0.07),Math.round(H*0.06)+Math.round(W*0.013)
+    );
+  }
 }
 
-function renderQuoteImage(canvas,{quote,author,accent,dark,format}){
+function renderQuoteImage(canvas,{text,author,accent,dark,format,index,total}){
   const f=FORMATS.find(x=>x.id===format)||FORMATS[0];
   canvas.width=f.w;canvas.height=f.h;
   const c=canvas.getContext('2d');
-  if(f.id==='reel')renderReel(c,f.w,f.h,{quote,author,accent,dark});
-  else if(f.id==='historia')renderHistoria(c,f.w,f.h,{quote,author,accent,dark});
-  else renderPost(c,f.w,f.h,{quote,author,accent,dark});
+  renderSlide(c,f.w,f.h,{text,author,accent,dark,index:index||0,total:total||1});
+}
+
+async function renderToBlob(opts){
+  const canvas=document.createElement('canvas');
+  renderQuoteImage(canvas,opts);
+  return new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
 }
 
 function ShareStudio({entry,onClose}){
+  const fragments=useMemo(()=>entry.body.split('\n\n').filter(Boolean),[entry]);
+  const[mode,setMode]=useState('fragmento');
   const[quote,setQuote]=useState(entry.quote||entry.excerpt);
-  const[author,setAuthor]=useState('@jasachz');
+  const[slide,setSlide]=useState(0);
+  const[author,setAuthor]=useState('jasachz');
   const[accent,setAccent]=useState(PALETTE[0]);
   const[imgDark,setImgDark]=useState(true);
   const[format,setFormat]=useState('post');
+  const[busy,setBusy]=useState(false);
   const canvasRef=useRef(null);
 
-  useEffect(()=>{
-    if(canvasRef.current)renderQuoteImage(canvasRef.current,{quote,author,accent,dark:imgDark,format});
-  },[quote,author,accent,imgDark,format]);
+  const currentText=mode==='carrusel'?fragments[slide]:quote;
 
-  const getBlob=()=>new Promise(resolve=>canvasRef.current.toBlob(resolve,'image/png'));
-  const filename=()=>slugify(quote)+'-'+format+'.png';
+  useEffect(()=>{
+    if(canvasRef.current)renderQuoteImage(canvasRef.current,{
+      text:currentText,author,accent,dark:imgDark,format,
+      index:mode==='carrusel'?slide:0,total:mode==='carrusel'?fragments.length:1
+    });
+  },[currentText,author,accent,imgDark,format,mode,slide]);
+
+  const filename=(i,n)=>slugify(currentText)+(n>1?'-'+String(i+1).padStart(2,'0'):'')+'.png';
 
   const download=async()=>{
-    const blob=await getBlob();
+    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,index:slide,total:mode==='carrusel'?fragments.length:1});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
-    a.href=url;a.download=filename();
+    a.href=url;a.download=filename(slide,1);
     document.body.appendChild(a);a.click();a.remove();
     URL.revokeObjectURL(url);
   };
 
   const share=async()=>{
-    const blob=await getBlob();
-    const file=new File([blob],filename(),{type:'image/png'});
+    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,index:slide,total:mode==='carrusel'?fragments.length:1});
+    const file=new File([blob],filename(slide,1),{type:'image/png'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
-      try{
-        await navigator.share({files:[file],text:quote});
-      }catch(e){}
+      try{await navigator.share({files:[file],text:currentText});}catch(e){}
     }else{
       download();
+    }
+  };
+
+  const downloadCarousel=async()=>{
+    setBusy(true);
+    try{
+      const zip=new JSZip();
+      for(let i=0;i<fragments.length;i++){
+        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,index:i,total:fragments.length});
+        zip.file(filename(i,fragments.length),blob);
+      }
+      const zipBlob=await zip.generateAsync({type:'blob'});
+      const url=URL.createObjectURL(zipBlob);
+      const a=document.createElement('a');
+      a.href=url;a.download=slugify(entry.title)+'-carrusel.zip';
+      document.body.appendChild(a);a.click();a.remove();
+      URL.revokeObjectURL(url);
+    }finally{
+      setBusy(false);
+    }
+  };
+
+  const shareCarousel=async()=>{
+    setBusy(true);
+    try{
+      const files=[];
+      for(let i=0;i<fragments.length;i++){
+        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,index:i,total:fragments.length});
+        files.push(new File([blob],filename(i,fragments.length),{type:'image/png'}));
+      }
+      if(navigator.canShare&&navigator.canShare({files})){
+        try{await navigator.share({files});}catch(e){}
+      }else{
+        await downloadCarousel();
+      }
+    }finally{
+      setBusy(false);
     }
   };
 
@@ -270,10 +279,22 @@ function ShareStudio({entry,onClose}){
     h('div',{className:'nx-studio',onClick:e=>e.stopPropagation()},
       h('button',{className:'nx-close',onClick:onClose},'×'),
       h('div',{className:'nx-studio-preview'},
-        h('canvas',{ref:canvasRef})
+        h('canvas',{ref:canvasRef}),
+        mode==='carrusel'&&fragments.length>1&&h('div',{className:'nx-slidenav'},
+          h('button',{disabled:slide===0,onClick:()=>setSlide(s=>Math.max(0,s-1))},'‹'),
+          h('span',{},(slide+1)+' / '+fragments.length),
+          h('button',{disabled:slide===fragments.length-1,onClick:()=>setSlide(s=>Math.min(fragments.length-1,s+1))},'›')
+        )
       ),
       h('div',{className:'nx-studio-form'},
         h('h3',{},'Crear imagen'),
+        h('div',{className:'nx-field'},
+          h('label',{},'Modo'),
+          h('div',{className:'nx-bgrow'},
+            h('button',{className:'nx-bgbtn'+(mode==='fragmento'?' active':''),onClick:()=>setMode('fragmento')},'Un fragmento'),
+            h('button',{className:'nx-bgbtn'+(mode==='carrusel'?' active':''),onClick:()=>{setMode('carrusel');setSlide(0);}},'Carrusel ('+fragments.length+')')
+          )
+        ),
         h('div',{className:'nx-field'},
           h('label',{},'Formato'),
           h('div',{className:'nx-bgrow'},
@@ -284,10 +305,15 @@ function ShareStudio({entry,onClose}){
             },f.label))
           )
         ),
-        h('div',{className:'nx-field'},
-          h('label',{},'Texto / fragmento'),
-          h('textarea',{rows:4,value:quote,onChange:e=>setQuote(e.target.value)})
-        ),
+        mode==='fragmento'
+          ?h('div',{className:'nx-field'},
+              h('label',{},'Texto / fragmento'),
+              h('textarea',{rows:4,value:quote,onChange:e=>setQuote(e.target.value)})
+            )
+          :h('div',{className:'nx-field'},
+              h('label',{},'Texto'),
+              h('div',{className:'nx-carousel-note'},'Se generará una imagen por cada párrafo del texto, lista para subir como carrusel.')
+            ),
         h('div',{className:'nx-field'},
           h('label',{},'Firma'),
           h('input',{value:author,onChange:e=>setAuthor(e.target.value)})
@@ -303,14 +329,19 @@ function ShareStudio({entry,onClose}){
             }))
           )
         ),
-        format!=='reel'&&h('div',{className:'nx-bgrow'},
+        h('div',{className:'nx-bgrow'},
           h('button',{className:'nx-bgbtn'+(imgDark?' active':''),onClick:()=>setImgDark(true)},'Oscuro'),
           h('button',{className:'nx-bgbtn'+(!imgDark?' active':''),onClick:()=>setImgDark(false)},'Claro')
         ),
-        h('div',{className:'nx-studio-actions'},
-          h('button',{className:'nx-btn-secondary',onClick:download},'Descargar'),
-          h('button',{className:'nx-btn-primary',onClick:share},'Compartir')
-        )
+        mode==='fragmento'
+          ?h('div',{className:'nx-studio-actions'},
+              h('button',{className:'nx-btn-secondary',onClick:download},'Descargar'),
+              h('button',{className:'nx-btn-primary',onClick:share},'Compartir')
+            )
+          :h('div',{className:'nx-studio-actions'},
+              h('button',{className:'nx-btn-secondary',disabled:busy,onClick:downloadCarousel},busy?'Generando…':'Descargar .zip'),
+              h('button',{className:'nx-btn-primary',disabled:busy,onClick:shareCarousel},busy?'Generando…':'Compartir todo')
+            )
       )
     )
   );
@@ -326,7 +357,7 @@ function Reader({entry,onClose}){
       h('div',{className:'nx-reader-date'},entry.date),
       h('h1',{},entry.title),
       paragraphs.map((p,i)=>h('p',{key:i},p)),
-      h('button',{className:'nx-share-btn',onClick:()=>setStudio(true)},'↗ Compartir como imagen')
+      h('button',{className:'nx-share-btn',onClick:()=>setStudio(true)},'↗ Crear imagen o carrusel')
     )
   );
 }
