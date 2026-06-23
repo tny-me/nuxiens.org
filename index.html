@@ -3,18 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nuxiens · escritos</title>
+<title>@jasachz · escritos</title>
 <meta name="description" content="Escritos personales sobre tecnología, pensamiento e ideas. Cada lectura, lista para compartir.">
-<meta property="og:title" content="Nuxiens · escritos">
+<meta property="og:title" content="@jasachz · escritos">
 <meta property="og:description" content="Escritos personales sobre tecnología, pensamiento e ideas. Cada lectura, lista para compartir.">
-<meta property="og:image" content="https://nuxiens.org/og.svg">
-<meta property="og:url" content="https://nuxiens.org">
 <meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Nuxiens · escritos">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="@jasachz · escritos">
 <meta name="twitter:description" content="Escritos personales sobre tecnología, pensamiento e ideas.">
-<meta name="twitter:image" content="https://nuxiens.org/og.svg">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23B31B1B'/%3E%3Ctext x='32' y='44' font-family='monospace' font-size='32' fill='white' text-anchor='middle'%3EN%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23B31B1B'/%3E%3Ctext x='32' y='44' font-family='monospace' font-size='32' fill='white' text-anchor='middle'%3EJ%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -97,8 +94,8 @@ const ENTRIES=[
     id:1,
     title:'Bienvenida',
     date:'23 de junio, 2026',
-    excerpt:'Nuxiens deja de ser un agregador de noticias y se convierte en un espacio personal de escritura — ideas, observaciones y reflexiones sobre tecnología y pensamiento.',
-    body:`Durante un tiempo, Nuxiens fue un agregador: un lugar que recopilaba lo que otros escribían. Hoy cambia de naturaleza. Este espacio existe ahora para lo que yo mismo tengo que decir.
+    excerpt:'Un espacio personal de escritura — ideas, observaciones y reflexiones sobre tecnología y pensamiento, sin agenda editorial.',
+    body:`Este espacio existe para lo que yo mismo tengo que decir.
 
 No hay aquí una promesa de frecuencia ni de tema fijo. Habrá tecnología, pero también habrá ideas que no caben en ninguna categoría — observaciones sobre cómo pensamos, cómo construimos, cómo decidimos.
 
@@ -137,15 +134,46 @@ function rrect(ctx,x,y,w,h,r){
   ctx.closePath();
 }
 
+function getLines(ctx,text,maxW,max){
+  const words=text.split(' ');
+  let line='',lines=[];
+  for(let i=0;i<words.length;i++){
+    const test=line+words[i]+' ';
+    if(ctx.measureText(test).width>maxW&&line){
+      if(max&&lines.length>=max-1){lines.push(line.trim()+'…');return lines;}
+      lines.push(line.trim());line=words[i]+' ';
+    }else{
+      line=test;
+    }
+  }
+  if(line)lines.push(line.trim());
+  return lines;
+}
+
+function slugify(text){
+  return (text||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'fragmento';
+}
+
 const PALETTE=['#B31B1B','#1D4ED8','#15803D','#7C3AED','#B45309','#0F766E'];
 
-function renderQuoteImage(canvas,{quote,author,accent,dark}){
-  const W=1080,H=1080,P=84;
-  canvas.width=W;canvas.height=H;
-  const c=canvas.getContext('2d');
+const FORMATS=[
+  {id:'post',label:'Publicación',w:1080,h:1080},
+  {id:'historia',label:'Historia',w:1080,h:1920},
+  {id:'reel',label:'Reel / TikTok',w:1080,h:1920}
+];
+
+function drawBrand(c,x,y,fg,align){
+  c.fillStyle=fg;
+  c.beginPath();c.arc(x+5,y-7,5,0,Math.PI*2);c.fill();
+  c.font='600 20px Inter,sans-serif';c.textAlign=align||'left';c.textBaseline='alphabetic';
+  c.fillText('@jasachz',align==='center'?x+12:x+18,y);
+}
+
+function renderPost(c,W,H,{quote,author,accent,dark}){
+  const P=84;
   const bg=dark?'#121110':'#FAFAF8';
   const fg=dark?'#EDEAE4':'#1A1816';
-  const fg2=dark?'rgba(237,234,228,0.5)':'rgba(26,24,22,0.5)';
   c.fillStyle=bg;c.fillRect(0,0,W,H);
   c.fillStyle=accent;c.fillRect(0,0,W,8);
   c.fillStyle=accent;c.font='italic 140px Georgia,serif';c.textAlign='left';
@@ -153,45 +181,85 @@ function renderQuoteImage(canvas,{quote,author,accent,dark}){
   c.fillStyle=fg;c.font='500 46px Georgia,serif';
   const endY=wrapText(c,quote,P,400,W-P*2,62,8);
   c.fillStyle=accent;c.font='italic 26px Georgia,serif';
-  c.fillText(author||'Nuxiens',P,endY+70);
+  c.fillText(author||'@jasachz',P,endY+70);
   c.strokeStyle=dark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.08)';c.lineWidth=1;
   c.beginPath();c.moveTo(P,H-110);c.lineTo(W-P,H-110);c.stroke();
-  c.fillStyle=accent;rrect(c,P,H-86,28,28,7);c.fill();
-  c.fillStyle='#fff';c.font='bold 14px monospace';c.textAlign='center';c.textBaseline='middle';
-  c.fillText('N',P+14,H-86+15);
-  c.textBaseline='alphabetic';c.textAlign='left';
-  c.fillStyle=fg;c.font='600 18px Inter,sans-serif';c.fillText('Nuxiens',P+38,H-86+14);
-  c.fillStyle=fg2;c.font='12px monospace';c.fillText('nuxiens.org',P+38,H-86+32);
+  drawBrand(c,P,H-70,fg,'left');
+}
+
+function renderHistoria(c,W,H,{quote,author,accent,dark}){
+  const P=96;
+  const bg=dark?'#121110':'#FAFAF8';
+  const fg=dark?'#EDEAE4':'#1A1816';
+  c.fillStyle=bg;c.fillRect(0,0,W,H);
+  c.fillStyle=accent;c.fillRect(0,0,W,10);
+  c.fillStyle=accent;c.font='italic 160px Georgia,serif';c.textAlign='left';
+  c.fillText('“',P-16,560);
+  c.fillStyle=fg;c.font='500 54px Georgia,serif';
+  const maxW=W-P*2,lh=72;
+  const lines=getLines(c,quote,maxW,9);
+  const blockH=lines.length*lh;
+  const startY=960-blockH/2+lh*0.3;
+  lines.forEach((ln,i)=>c.fillText(ln,P,startY+i*lh));
+  c.fillStyle=accent;c.font='italic 30px Georgia,serif';
+  c.fillText(author||'@jasachz',P,startY+blockH+50);
+  drawBrand(c,P,H-150,fg,'left');
+}
+
+function renderReel(c,W,H,{quote,author,accent}){
+  c.fillStyle=accent;c.fillRect(0,0,W,H);
+  c.fillStyle='rgba(255,255,255,0.85)';c.font='italic 120px Georgia,serif';c.textAlign='center';
+  c.fillText('“',W/2,520);
+  c.fillStyle='#fff';c.font='600 58px Georgia,serif';c.textAlign='center';
+  const maxW=W-160,lh=78;
+  const lines=getLines(c,quote,maxW,9);
+  const blockH=lines.length*lh;
+  const startY=960-blockH/2+lh*0.3;
+  lines.forEach((ln,i)=>c.fillText(ln,W/2,startY+i*lh));
+  c.font='italic 28px Georgia,serif';c.fillStyle='rgba(255,255,255,0.85)';
+  c.fillText(author||'@jasachz',W/2,startY+blockH+60);
+  drawBrand(c,W/2-50,H-150,'#fff','center');
+}
+
+function renderQuoteImage(canvas,{quote,author,accent,dark,format}){
+  const f=FORMATS.find(x=>x.id===format)||FORMATS[0];
+  canvas.width=f.w;canvas.height=f.h;
+  const c=canvas.getContext('2d');
+  if(f.id==='reel')renderReel(c,f.w,f.h,{quote,author,accent,dark});
+  else if(f.id==='historia')renderHistoria(c,f.w,f.h,{quote,author,accent,dark});
+  else renderPost(c,f.w,f.h,{quote,author,accent,dark});
 }
 
 function ShareStudio({entry,onClose}){
   const[quote,setQuote]=useState(entry.quote||entry.excerpt);
-  const[author,setAuthor]=useState('Nuxiens');
+  const[author,setAuthor]=useState('@jasachz');
   const[accent,setAccent]=useState(PALETTE[0]);
   const[imgDark,setImgDark]=useState(true);
+  const[format,setFormat]=useState('post');
   const canvasRef=useRef(null);
 
   useEffect(()=>{
-    if(canvasRef.current)renderQuoteImage(canvasRef.current,{quote,author,accent,dark:imgDark});
-  },[quote,author,accent,imgDark]);
+    if(canvasRef.current)renderQuoteImage(canvasRef.current,{quote,author,accent,dark:imgDark,format});
+  },[quote,author,accent,imgDark,format]);
 
   const getBlob=()=>new Promise(resolve=>canvasRef.current.toBlob(resolve,'image/png'));
+  const filename=()=>slugify(quote)+'-'+format+'.png';
 
   const download=async()=>{
     const blob=await getBlob();
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
-    a.href=url;a.download='nuxiens-'+entry.id+'.png';
+    a.href=url;a.download=filename();
     document.body.appendChild(a);a.click();a.remove();
     URL.revokeObjectURL(url);
   };
 
   const share=async()=>{
     const blob=await getBlob();
-    const file=new File([blob],'nuxiens-'+entry.id+'.png',{type:'image/png'});
+    const file=new File([blob],filename(),{type:'image/png'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
       try{
-        await navigator.share({files:[file],title:entry.title,text:quote+'\n\nnuxiens.org'});
+        await navigator.share({files:[file],text:quote});
       }catch(e){}
     }else{
       download();
@@ -207,7 +275,17 @@ function ShareStudio({entry,onClose}){
       h('div',{className:'nx-studio-form'},
         h('h3',{},'Crear imagen'),
         h('div',{className:'nx-field'},
-          h('label',{},'Cita o fragmento'),
+          h('label',{},'Formato'),
+          h('div',{className:'nx-bgrow'},
+            FORMATS.map(f=>h('button',{
+              key:f.id,
+              className:'nx-bgbtn'+(format===f.id?' active':''),
+              onClick:()=>setFormat(f.id)
+            },f.label))
+          )
+        ),
+        h('div',{className:'nx-field'},
+          h('label',{},'Texto / fragmento'),
           h('textarea',{rows:4,value:quote,onChange:e=>setQuote(e.target.value)})
         ),
         h('div',{className:'nx-field'},
@@ -225,7 +303,7 @@ function ShareStudio({entry,onClose}){
             }))
           )
         ),
-        h('div',{className:'nx-bgrow'},
+        format!=='reel'&&h('div',{className:'nx-bgrow'},
           h('button',{className:'nx-bgbtn'+(imgDark?' active':''),onClick:()=>setImgDark(true)},'Oscuro'),
           h('button',{className:'nx-bgbtn'+(!imgDark?' active':''),onClick:()=>setImgDark(false)},'Claro')
         ),
@@ -269,7 +347,7 @@ function App(){
 
   return h('div',{'data-dark':dark?'1':undefined},
     h('nav',{className:'nx-nav'},
-      h('div',{className:'nx-logo'},h('span',{},'N'),'Nuxiens'),
+      h('div',{className:'nx-logo'},h('span',{},'J'),'@jasachz'),
       h('button',{className:'nx-toggle',onClick:()=>setDark(!dark)},dark?'☀':'☾')
     ),
     h('div',{className:'nx-hero'},
@@ -286,7 +364,7 @@ function App(){
       ))
     ),
     h('footer',{},
-      h('span',{},'nuxiens.org'),
+      h('span',{},'@jasachz'),
       h('span',{},'© 2026')
     ),
     open&&h(Reader,{entry:open,onClose:()=>setOpen(null)})
