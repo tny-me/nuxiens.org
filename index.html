@@ -131,7 +131,7 @@ function slugify(text){
     .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'fragmento';
 }
 
-const PALETTE=['#B31B1B','#1D4ED8','#15803D','#7C3AED','#B45309','#0F766E'];
+const PALETTE=['#16140F','#1B2A4A','#4A4842','#9C968C'];
 
 const FORMATS=[
   {id:'post',label:'Publicación',w:1080,h:1080},
@@ -143,12 +143,22 @@ function trackedText(s){
   return (s||'').toUpperCase().split('').join(' ');
 }
 
-function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
+function renderSlide(c,W,H,{text,author,accent,dark,index,total,watermark}){
   const bg=dark?'#0E0E0E':'#FAFAF8';
   const fg=dark?'#F3F1EC':'#16140F';
   const fgMuted=dark?'rgba(243,241,236,0.42)':'rgba(22,20,15,0.42)';
   c.fillStyle=bg;c.fillRect(0,0,W,H);
   c.textBaseline='alphabetic';
+
+  if(watermark){
+    c.save();
+    c.globalAlpha=dark?0.05:0.045;
+    c.fillStyle=fg;
+    c.font='500 '+Math.round(W*0.62)+'px Inter,sans-serif';
+    c.textAlign='center';c.textBaseline='middle';
+    c.fillText('@',W/2,H/2);
+    c.restore();
+  }
 
   const fontSize=Math.round(W*0.046);
   const lh=Math.round(fontSize*1.38);
@@ -183,11 +193,11 @@ function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
   }
 }
 
-function renderQuoteImage(canvas,{text,author,accent,dark,format,index,total}){
+function renderQuoteImage(canvas,{text,author,accent,dark,format,index,total,watermark}){
   const f=FORMATS.find(x=>x.id===format)||FORMATS[0];
   canvas.width=f.w;canvas.height=f.h;
   const c=canvas.getContext('2d');
-  renderSlide(c,f.w,f.h,{text,author,accent,dark,index:index||0,total:total||1});
+  renderSlide(c,f.w,f.h,{text,author,accent,dark,index:index||0,total:total||1,watermark});
 }
 
 async function renderToBlob(opts){
@@ -205,6 +215,7 @@ function ShareStudio({entry,onClose}){
   const[accent,setAccent]=useState(PALETTE[0]);
   const[imgDark,setImgDark]=useState(true);
   const[format,setFormat]=useState('post');
+  const[watermark,setWatermark]=useState(false);
   const[busy,setBusy]=useState(false);
   const canvasRef=useRef(null);
 
@@ -212,15 +223,15 @@ function ShareStudio({entry,onClose}){
 
   useEffect(()=>{
     if(canvasRef.current)renderQuoteImage(canvasRef.current,{
-      text:currentText,author,accent,dark:imgDark,format,
+      text:currentText,author,accent,dark:imgDark,format,watermark,
       index:mode==='carrusel'?slide:0,total:mode==='carrusel'?fragments.length:1
     });
-  },[currentText,author,accent,imgDark,format,mode,slide]);
+  },[currentText,author,accent,imgDark,format,watermark,mode,slide]);
 
   const filename=(i,n)=>slugify(currentText)+(n>1?'-'+String(i+1).padStart(2,'0'):'')+'.png';
 
   const download=async()=>{
-    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,index:slide,total:mode==='carrusel'?fragments.length:1});
+    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,watermark,index:slide,total:mode==='carrusel'?fragments.length:1});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
     a.href=url;a.download=filename(slide,1);
@@ -229,7 +240,7 @@ function ShareStudio({entry,onClose}){
   };
 
   const share=async()=>{
-    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,index:slide,total:mode==='carrusel'?fragments.length:1});
+    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,watermark,index:slide,total:mode==='carrusel'?fragments.length:1});
     const file=new File([blob],filename(slide,1),{type:'image/png'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
       try{await navigator.share({files:[file],text:currentText});}catch(e){}
@@ -243,7 +254,7 @@ function ShareStudio({entry,onClose}){
     try{
       const zip=new JSZip();
       for(let i=0;i<fragments.length;i++){
-        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,index:i,total:fragments.length});
+        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,watermark,index:i,total:fragments.length});
         zip.file(filename(i,fragments.length),blob);
       }
       const zipBlob=await zip.generateAsync({type:'blob'});
@@ -262,7 +273,7 @@ function ShareStudio({entry,onClose}){
     try{
       const files=[];
       for(let i=0;i<fragments.length;i++){
-        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,index:i,total:fragments.length});
+        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,watermark,index:i,total:fragments.length});
         files.push(new File([blob],filename(i,fragments.length),{type:'image/png'}));
       }
       if(navigator.canShare&&navigator.canShare({files})){
@@ -332,6 +343,10 @@ function ShareStudio({entry,onClose}){
         h('div',{className:'nx-bgrow'},
           h('button',{className:'nx-bgbtn'+(imgDark?' active':''),onClick:()=>setImgDark(true)},'Oscuro'),
           h('button',{className:'nx-bgbtn'+(!imgDark?' active':''),onClick:()=>setImgDark(false)},'Claro')
+        ),
+        h('div',{className:'nx-bgrow'},
+          h('button',{className:'nx-bgbtn'+(!watermark?' active':''),onClick:()=>setWatermark(false)},'Liso'),
+          h('button',{className:'nx-bgbtn'+(watermark?' active':''),onClick:()=>setWatermark(true)},'Marca de agua')
         ),
         mode==='fragmento'
           ?h('div',{className:'nx-studio-actions'},
