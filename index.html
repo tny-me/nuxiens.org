@@ -11,59 +11,60 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="@jasachz · escritos">
 <meta name="twitter:description" content="Escritos personales sobre tecnología, pensamiento e ideas.">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23B31B1B'/%3E%3Ctext x='32' y='44' font-family='monospace' font-size='32' fill='white' text-anchor='middle'%3EJ%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23211E18'/%3E%3Ctext x='32' y='44' font-family='monospace' font-size='32' fill='%23F8F5EE' text-anchor='middle'%3Ej%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#FAFAF8;--surface:#FFFFFF;--border:#E8E5DF;
-  --text:#1A1816;--text2:#5C5750;--text3:#9B958C;
-  --accent:#B31B1B;
+  --bg:#F8F5EE;--surface:#FFFEFB;--border:#E2DCCB;
+  --text:#211E18;--text2:#5A5444;--text3:#9C9480;
+  --accent:#7A3B32;
   --serif:'Source Serif 4',Georgia,serif;--sans:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
 }
 [data-dark="1"]{
-  --bg:#121110;--surface:#1A1816;--border:#2A2722;
-  --text:#EDEAE4;--text2:#9B958C;--text3:#5C5750;
-  --accent:#E0726B;
+  --bg:#16140F;--surface:#1C1A14;--border:#2D2A20;
+  --text:#EAE4D4;--text2:#A89F89;--text3:#6B6451;
+  --accent:#C68A78;
 }
-html,body{background:var(--bg);color:var(--text);font-family:var(--sans);transition:background .2s,color .2s}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);transition:background .2s,color .2s;-webkit-text-size-adjust:100%}
 a{color:inherit;text-decoration:none}
-.nx-nav{display:flex;align-items:center;justify-content:space-between;max-width:760px;margin:0 auto;padding:28px 24px}
-.nx-logo{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:500;font-size:15px;letter-spacing:.2px}
-.nx-logo span{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:var(--accent);color:#fff;font-size:13px}
-.nx-toggle{border:1px solid var(--border);background:transparent;color:var(--text2);width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
-.nx-toggle:hover{color:var(--text)}
-.nx-hero{max-width:760px;margin:0 auto;padding:40px 24px 32px}
-.nx-eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--accent)}
-.nx-list{max-width:760px;margin:0 auto;padding:0 24px 100px;list-style:none}
-.nx-entry{border-top:1px solid var(--border);padding:26px 0;cursor:pointer;display:flex;gap:22px;align-items:baseline}
+.nx-nav{display:flex;align-items:center;justify-content:space-between;max-width:680px;margin:0 auto;padding:22px 20px;border-bottom:1px solid var(--border)}
+.nx-logo{display:flex;align-items:baseline;gap:8px;font-family:var(--serif);font-weight:500;font-style:italic;font-size:17px;letter-spacing:.2px;color:var(--text)}
+.nx-logo span{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--accent)}
+.nx-toggle{border:1px solid var(--border);background:transparent;color:var(--text2);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.nx-toggle:hover{color:var(--text);border-color:var(--text3)}
+.nx-hero{max-width:680px;margin:0 auto;padding:28px 20px 8px}
+.nx-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)}
+.nx-list{max-width:680px;margin:0 auto;padding:8px 20px 90px;list-style:none}
+.nx-entry{border-top:1px solid var(--border);padding:22px 0;cursor:pointer;display:flex;gap:18px;align-items:baseline}
 .nx-entry:last-child{border-bottom:1px solid var(--border)}
-.nx-entry-code{font-family:var(--mono);font-size:12px;color:var(--text3);flex:0 0 auto;width:92px}
+.nx-entry-code{font-family:var(--mono);font-size:12px;color:var(--accent);flex:0 0 auto;width:80px}
 .nx-entry-body{flex:1;min-width:0}
-.nx-entry h2{font-family:var(--serif);font-weight:500;font-size:25px;line-height:1.3;margin-bottom:10px;transition:color .15s}
+.nx-entry h2{font-family:var(--serif);font-weight:500;font-size:22px;line-height:1.32;margin-bottom:8px;transition:color .15s}
 .nx-entry:hover h2{color:var(--accent)}
-.nx-entry p{font-family:var(--serif);font-size:16px;line-height:1.6;color:var(--text2)}
-.nx-entry-more{display:inline-block;margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.3px}
-footer{max-width:760px;margin:0 auto;padding:32px 24px 60px;border-top:1px solid var(--border);font-family:var(--mono);font-size:12px;color:var(--text3);display:flex;justify-content:space-between}
+.nx-entry p{font-family:var(--serif);font-style:italic;font-size:15px;line-height:1.55;color:var(--text2)}
+.nx-entry-more{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.3px}
+.nx-entry:hover .nx-entry-more{color:var(--accent)}
+footer{max-width:680px;margin:0 auto;padding:26px 20px 50px;border-top:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--text3);display:flex;justify-content:space-between}
 .nx-reader-overlay{position:fixed;inset:0;background:var(--bg);z-index:50;overflow-y:auto;animation:nxfade .18s ease}
 @keyframes nxfade{from{opacity:0}to{opacity:1}}
-.nx-reader{max-width:680px;margin:0 auto;padding:32px 24px 100px}
-.nx-back{display:inline-flex;align-items:center;gap:6px;border:none;background:transparent;color:var(--text2);font-family:var(--mono);font-size:13px;cursor:pointer;margin-bottom:36px}
+.nx-reader{max-width:620px;margin:0 auto;padding:26px 20px 90px}
+.nx-back{display:inline-flex;align-items:center;gap:6px;border:none;background:transparent;color:var(--text2);font-family:var(--mono);font-size:12px;cursor:pointer;margin-bottom:30px}
 .nx-back:hover{color:var(--text)}
-.nx-reader-date{font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:14px}
-.nx-reader h1{font-family:var(--serif);font-weight:500;font-size:36px;line-height:1.25;letter-spacing:-.4px;margin-bottom:30px}
-.nx-reader p{font-family:var(--serif);font-size:19px;line-height:1.75;color:var(--text);margin-bottom:22px}
-.nx-share-btn{margin-top:30px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:var(--sans);font-weight:500;font-size:14px;padding:11px 18px;border-radius:9px;cursor:pointer}
+.nx-reader-date{font-family:var(--mono);font-size:12px;color:var(--accent);margin-bottom:12px}
+.nx-reader h1{font-family:var(--serif);font-weight:500;font-size:clamp(26px,6vw,34px);line-height:1.28;letter-spacing:-.2px;margin-bottom:26px}
+.nx-reader p{font-family:var(--serif);font-size:18px;line-height:1.8;color:var(--text);margin-bottom:20px}
+.nx-share-btn{margin-top:26px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:var(--sans);font-weight:500;font-size:13px;padding:10px 16px;border-radius:9px;cursor:pointer}
 .nx-share-btn:hover{border-color:var(--accent);color:var(--accent)}
-.nx-studio-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;animation:nxfade .15s ease}
-.nx-studio{background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:880px;width:100%;max-height:90vh;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:0}
+.nx-studio-overlay{position:fixed;inset:0;background:rgba(20,17,12,.6);z-index:60;display:flex;align-items:center;justify-content:center;padding:14px;animation:nxfade .15s ease}
+.nx-studio{background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:880px;width:100%;max-height:92vh;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:0}
 @media (max-width:720px){.nx-studio{grid-template-columns:1fr}}
-.nx-studio-preview{background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+.nx-studio-preview{background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px}
 .nx-studio-preview canvas{width:100%;max-width:340px;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,.15)}
-.nx-studio-form{padding:28px}
-.nx-studio-form h3{font-family:var(--serif);font-size:20px;margin-bottom:18px}
+.nx-studio-form{padding:24px}
+.nx-studio-form h3{font-family:var(--serif);font-size:19px;margin-bottom:16px}
 .nx-field{margin-bottom:16px}
 .nx-field label{display:block;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px}
 .nx-field textarea,.nx-field input{width:100%;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;padding:10px 12px;border-radius:8px;resize:vertical}
@@ -84,6 +85,12 @@ footer{max-width:760px;margin:0 auto;padding:32px 24px 60px;border-top:1px solid
 .nx-slidenav button:disabled{opacity:.3;cursor:default}
 .nx-slidenav span{font-family:var(--mono);font-size:12px;color:var(--text3)}
 .nx-carousel-note{font-family:var(--sans);font-size:13px;color:var(--text2);line-height:1.5;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px}
+@media (max-width:480px){
+  .nx-entry{flex-direction:column;gap:6px;padding:20px 0}
+  .nx-entry-code{width:auto}
+  .nx-reader h1{margin-bottom:20px}
+  .nx-reader p{font-size:17px}
+}
 </style>
 </head>
 <body>
@@ -439,7 +446,7 @@ function App(){
 
   return h('div',{'data-dark':dark?'1':undefined},
     h('nav',{className:'nx-nav'},
-      h('div',{className:'nx-logo'},h('span',{},'J'),'@jasachz'),
+      h('div',{className:'nx-logo'},'jasachz',h('span',{},'·escritos')),
       h('button',{className:'nx-toggle',onClick:()=>setDark(!dark)},dark?'☀':'☾')
     ),
     h('div',{className:'nx-hero'},
