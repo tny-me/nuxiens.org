@@ -143,11 +143,12 @@ function trackedText(s){
   return (s||'').toUpperCase().split('').join(' ');
 }
 
-function fitQuote(c,text,W,H){
+function fitQuote(c,text,W,H,withCode){
   const fontStack='-apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,sans-serif';
   const maxFont=Math.round(W*0.024),minFont=Math.round(W*0.013);
   const maxW=Math.round(W*0.62);
-  const footer=Math.round(W*0.022)+Math.round(W*0.03)+Math.round(W*0.014*1.3);
+  let footer=Math.round(W*0.022)+Math.round(W*0.03)+Math.round(W*0.014*1.3);
+  if(withCode)footer+=Math.round(W*0.012)+Math.round(W*0.012*1.3);
   const safeH=Math.max(minFont*1.45,H-Math.round(W*0.34)-footer);
   let fontSize=maxFont,lines,lh,blockH;
   for(;fontSize>=minFont;fontSize--){
@@ -168,7 +169,7 @@ function fitQuote(c,text,W,H){
   return{fontSize,lines,lh,blockH,maxW,fontStack,footer};
 }
 
-function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
+function renderSlide(c,W,H,{text,author,accent,dark,index,total,code}){
   const bgA=dark?'#000000':'#FFFFFF';
   const bgB=dark?'#111114':'#F4F3F0';
   const fg=dark?'#F5F5F7':'#1D1D1F';
@@ -180,7 +181,7 @@ function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
   c.fillStyle=grad;c.fillRect(0,0,W,H);
   c.textBaseline='alphabetic';
 
-  const{fontSize,lines,lh,blockH,fontStack,footer}=fitQuote(c,text,W,H);
+  const{fontSize,lines,lh,blockH,fontStack,footer}=fitQuote(c,text,W,H,!!code);
   const totalH=blockH+footer;
   const startY=Math.round(H/2-totalH/2+lh*0.3);
 
@@ -196,7 +197,14 @@ function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
 
   c.font='500 '+Math.round(W*0.014)+'px Inter,sans-serif';
   c.fillStyle=fgMuted;c.textAlign='center';
-  c.fillText(trackedText(author||'jasachz'),W/2,lineY+Math.round(W*0.03));
+  const authorY=lineY+Math.round(W*0.03);
+  c.fillText(trackedText(author||'jasachz'),W/2,authorY);
+
+  if(code){
+    c.font='500 '+Math.round(W*0.012)+'px "JetBrains Mono",monospace';
+    c.fillStyle=fgMuted;c.textAlign='center';
+    c.fillText(code,W/2,authorY+Math.round(W*0.012)+Math.round(W*0.012*1.3));
+  }
 
   if(total>1){
     c.font='500 '+Math.round(W*0.013)+'px "JetBrains Mono",monospace';
@@ -208,11 +216,21 @@ function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
   }
 }
 
-function renderQuoteImage(canvas,{text,author,accent,dark,format,index,total}){
+function renderQuoteImage(canvas,{text,author,accent,dark,format,index,total,code}){
   const f=FORMATS.find(x=>x.id===format)||FORMATS[0];
   canvas.width=f.w;canvas.height=f.h;
   const c=canvas.getContext('2d');
-  renderSlide(c,f.w,f.h,{text,author,accent,dark,index:index||0,total:total||1});
+  renderSlide(c,f.w,f.h,{text,author,accent,dark,index:index||0,total:total||1,code});
+}
+
+function shortDate(dateISO){
+  if(!dateISO)return'';
+  const[y,m,d]=dateISO.split('-');
+  return d+'.'+m+'.'+y.slice(2);
+}
+function entryCode(entry){
+  if(!entry||!entry.dateISO)return'';
+  return String(entry.id).padStart(2,'0')+':'+shortDate(entry.dateISO);
 }
 
 async function renderToBlob(opts){
@@ -234,18 +252,19 @@ function ShareStudio({entry,onClose}){
   const canvasRef=useRef(null);
 
   const currentText=mode==='carrusel'?fragments[slide]:quote;
+  const code=useMemo(()=>entryCode(entry),[entry]);
 
   useEffect(()=>{
     if(canvasRef.current)renderQuoteImage(canvasRef.current,{
-      text:currentText,author,accent,dark:imgDark,format,
+      text:currentText,author,accent,dark:imgDark,format,code,
       index:mode==='carrusel'?slide:0,total:mode==='carrusel'?fragments.length:1
     });
-  },[currentText,author,accent,imgDark,format,mode,slide]);
+  },[currentText,author,accent,imgDark,format,mode,slide,code]);
 
   const filename=(i,n)=>slugify(currentText)+(n>1?'-'+String(i+1).padStart(2,'0'):'')+'.png';
 
   const download=async()=>{
-    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,index:slide,total:mode==='carrusel'?fragments.length:1});
+    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,code,index:slide,total:mode==='carrusel'?fragments.length:1});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
     a.href=url;a.download=filename(slide,1);
@@ -254,7 +273,7 @@ function ShareStudio({entry,onClose}){
   };
 
   const share=async()=>{
-    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,index:slide,total:mode==='carrusel'?fragments.length:1});
+    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,code,index:slide,total:mode==='carrusel'?fragments.length:1});
     const file=new File([blob],filename(slide,1),{type:'image/png'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
       try{await navigator.share({files:[file],text:currentText});}catch(e){}
@@ -268,7 +287,7 @@ function ShareStudio({entry,onClose}){
     try{
       const zip=new JSZip();
       for(let i=0;i<fragments.length;i++){
-        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,index:i,total:fragments.length});
+        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,code,index:i,total:fragments.length});
         zip.file(filename(i,fragments.length),blob);
       }
       const zipBlob=await zip.generateAsync({type:'blob'});
@@ -287,7 +306,7 @@ function ShareStudio({entry,onClose}){
     try{
       const files=[];
       for(let i=0;i<fragments.length;i++){
-        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,index:i,total:fragments.length});
+        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,code,index:i,total:fragments.length});
         files.push(new File([blob],filename(i,fragments.length),{type:'image/png'}));
       }
       if(navigator.canShare&&navigator.canShare({files})){

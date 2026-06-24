@@ -62,17 +62,22 @@ function b64DecodeUnicode(str){
   return new TextDecoder().decode(bytes);
 }
 
-function todayEs(){
+const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+function todayISO(){
   const d=new Date();
-  const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  return d.getDate()+' de '+meses[d.getMonth()]+', '+d.getFullYear();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function esDateFromISO(iso){
+  const[y,m,dd]=iso.split('-').map(Number);
+  return dd+' de '+MESES[m-1]+', '+y;
 }
 
 function App(){
   const[token,setToken]=useState('');
   const[showToken,setShowToken]=useState(false);
   const[title,setTitle]=useState('');
-  const[date,setDate]=useState(todayEs());
+  const[dateISO,setDateISO]=useState(todayISO());
   const[excerpt,setExcerpt]=useState('');
   const[body,setBody]=useState('');
   const[quote,setQuote]=useState('');
@@ -101,10 +106,12 @@ function App(){
       const getData=await getRes.json();
       const current=JSON.parse(b64DecodeUnicode(getData.content.replace(/\n/g,'')));
       const nextId=current.reduce((m,e)=>Math.max(m,e.id||0),0)+1;
+      const iso=dateISO||todayISO();
       const entry={
         id:nextId,
         title:title.trim(),
-        date:date.trim()||todayEs(),
+        date:esDateFromISO(iso),
+        dateISO:iso,
         excerpt:excerpt.trim()||body.trim().split('\n\n')[0].slice(0,200),
         body:body.trim(),
         quote:quote.trim()||excerpt.trim()||body.trim().split('\n\n')[0]
@@ -126,7 +133,7 @@ function App(){
         throw new Error(err.message||('Error al publicar ('+putRes.status+')'));
       }
       setStatus({type:'ok',msg:'Publicado. El sitio se actualizará en uno o dos minutos.'});
-      setTitle('');setExcerpt('');setBody('');setQuote('');setDate(todayEs());
+      setTitle('');setExcerpt('');setBody('');setQuote('');setDateISO(todayISO());
     }catch(e){
       setStatus({type:'err',msg:e.message||'Error desconocido.'});
     }finally{
@@ -165,8 +172,9 @@ function App(){
         h('input',{value:title,onChange:e=>setTitle(e.target.value)})
       ),
       h('div',{className:'field'},
-        h('label',{},'Fecha'),
-        h('input',{value:date,onChange:e=>setDate(e.target.value)})
+        h('label',{},'Fecha de publicación'),
+        h('input',{type:'date',value:dateISO,onChange:e=>setDateISO(e.target.value)}),
+        h('div',{className:'hint'},'Se usa para mostrar la fecha en el sitio y para el código de la imagen (ej. 01:24.06.26).')
       ),
       h('div',{className:'field'},
         h('label',{},'Extracto (se muestra en la lista)'),
