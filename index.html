@@ -71,7 +71,8 @@ footer{max-width:760px;margin:0 auto;padding:32px 24px 60px;border-top:1px solid
 .nx-swatches{display:flex;gap:8px;margin-bottom:16px}
 .nx-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent}
 .nx-swatch.active{border-color:var(--text)}
-.nx-bgrow{display:flex;gap:8px;margin-bottom:20px}
+.nx-bgrow{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.nx-bgrow .nx-bgbtn{flex:1 1 auto;min-width:64px}
 .nx-bgbtn{flex:1;border:1px solid var(--border);background:var(--bg);color:var(--text2);font-family:var(--sans);font-size:13px;padding:9px;border-radius:8px;cursor:pointer}
 .nx-bgbtn.active{border-color:var(--accent);color:var(--accent)}
 .nx-studio-actions{display:flex;gap:10px}
@@ -169,11 +170,17 @@ function fitQuote(c,text,W,H,withCode){
   return{fontSize,lines,lh,blockH,maxW,fontStack,footer};
 }
 
-function renderSlide(c,W,H,{text,author,accent,dark,index,total,code}){
-  const bgA=dark?'#000000':'#FFFFFF';
-  const bgB=dark?'#111114':'#F4F3F0';
-  const fg=dark?'#F5F5F7':'#1D1D1F';
-  const fgMuted=dark?'rgba(245,245,247,0.45)':'rgba(29,29,31,0.45)';
+const BG_THEMES=[
+  {id:'dark',label:'Negro',bgA:'#000000',bgB:'#111114',fg:'#F5F5F7',fgMuted:'rgba(245,245,247,0.45)'},
+  {id:'light',label:'Blanco',bgA:'#FFFFFF',bgB:'#F4F3F0',fg:'#1D1D1F',fgMuted:'rgba(29,29,31,0.45)'},
+  {id:'gray',label:'Gris',bgA:'#F2F1EE',bgB:'#E3E1DB',fg:'#1D1D1F',fgMuted:'rgba(29,29,31,0.45)'},
+  {id:'blue',label:'Azul',bgA:'#EEF3F8',bgB:'#DCE6F0',fg:'#19222E',fgMuted:'rgba(25,34,46,0.45)'},
+  {id:'green',label:'Verde',bgA:'#EEF4EE',bgB:'#DCE9DC',fg:'#1A2A1E',fgMuted:'rgba(26,42,30,0.45)'}
+];
+
+function renderSlide(c,W,H,{text,author,accent,bg,index,total,code}){
+  const theme=BG_THEMES.find(t=>t.id===bg)||BG_THEMES[0];
+  const{bgA,bgB,fg,fgMuted}=theme;
 
   const grad=c.createRadialGradient(W/2,H*0.42,W*0.08,W/2,H*0.5,W*0.8);
   grad.addColorStop(0,bgB);
@@ -216,11 +223,11 @@ function renderSlide(c,W,H,{text,author,accent,dark,index,total,code}){
   }
 }
 
-function renderQuoteImage(canvas,{text,author,accent,dark,format,index,total,code}){
+function renderQuoteImage(canvas,{text,author,accent,bg,format,index,total,code}){
   const f=FORMATS.find(x=>x.id===format)||FORMATS[0];
   canvas.width=f.w;canvas.height=f.h;
   const c=canvas.getContext('2d');
-  renderSlide(c,f.w,f.h,{text,author,accent,dark,index:index||0,total:total||1,code});
+  renderSlide(c,f.w,f.h,{text,author,accent,bg,index:index||0,total:total||1,code});
 }
 
 function shortDate(dateISO){
@@ -246,7 +253,7 @@ function ShareStudio({entry,onClose}){
   const[slide,setSlide]=useState(0);
   const[author,setAuthor]=useState('jasachz');
   const[accent,setAccent]=useState(PALETTE[0]);
-  const[imgDark,setImgDark]=useState(true);
+  const[bg,setBg]=useState('dark');
   const[format,setFormat]=useState('post');
   const[busy,setBusy]=useState(false);
   const canvasRef=useRef(null);
@@ -256,15 +263,15 @@ function ShareStudio({entry,onClose}){
 
   useEffect(()=>{
     if(canvasRef.current)renderQuoteImage(canvasRef.current,{
-      text:currentText,author,accent,dark:imgDark,format,code,
+      text:currentText,author,accent,bg,format,code,
       index:mode==='carrusel'?slide:0,total:mode==='carrusel'?fragments.length:1
     });
-  },[currentText,author,accent,imgDark,format,mode,slide,code]);
+  },[currentText,author,accent,bg,format,mode,slide,code]);
 
   const filename=(i,n)=>slugify(currentText)+(n>1?'-'+String(i+1).padStart(2,'0'):'')+'.png';
 
   const download=async()=>{
-    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,code,index:slide,total:mode==='carrusel'?fragments.length:1});
+    const blob=await renderToBlob({text:currentText,author,accent,bg,format,code,index:slide,total:mode==='carrusel'?fragments.length:1});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
     a.href=url;a.download=filename(slide,1);
@@ -273,7 +280,7 @@ function ShareStudio({entry,onClose}){
   };
 
   const share=async()=>{
-    const blob=await renderToBlob({text:currentText,author,accent,dark:imgDark,format,code,index:slide,total:mode==='carrusel'?fragments.length:1});
+    const blob=await renderToBlob({text:currentText,author,accent,bg,format,code,index:slide,total:mode==='carrusel'?fragments.length:1});
     const file=new File([blob],filename(slide,1),{type:'image/png'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){
       try{await navigator.share({files:[file],text:currentText});}catch(e){}
@@ -287,7 +294,7 @@ function ShareStudio({entry,onClose}){
     try{
       const zip=new JSZip();
       for(let i=0;i<fragments.length;i++){
-        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,code,index:i,total:fragments.length});
+        const blob=await renderToBlob({text:fragments[i],author,accent,bg,format,code,index:i,total:fragments.length});
         zip.file(filename(i,fragments.length),blob);
       }
       const zipBlob=await zip.generateAsync({type:'blob'});
@@ -306,7 +313,7 @@ function ShareStudio({entry,onClose}){
     try{
       const files=[];
       for(let i=0;i<fragments.length;i++){
-        const blob=await renderToBlob({text:fragments[i],author,accent,dark:imgDark,format,code,index:i,total:fragments.length});
+        const blob=await renderToBlob({text:fragments[i],author,accent,bg,format,code,index:i,total:fragments.length});
         files.push(new File([blob],filename(i,fragments.length),{type:'image/png'}));
       }
       if(navigator.canShare&&navigator.canShare({files})){
@@ -374,8 +381,11 @@ function ShareStudio({entry,onClose}){
           )
         ),
         h('div',{className:'nx-bgrow'},
-          h('button',{className:'nx-bgbtn'+(imgDark?' active':''),onClick:()=>setImgDark(true)},'Oscuro'),
-          h('button',{className:'nx-bgbtn'+(!imgDark?' active':''),onClick:()=>setImgDark(false)},'Claro')
+          BG_THEMES.map(t=>h('button',{
+            key:t.id,
+            className:'nx-bgbtn'+(bg===t.id?' active':''),
+            onClick:()=>setBg(t.id)
+          },t.label))
         ),
         mode==='fragmento'
           ?h('div',{className:'nx-studio-actions'},
