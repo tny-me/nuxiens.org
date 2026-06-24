@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>escribir — jasachz</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FAFAF8;--surface:#FFFFFF;--border:#E8E5DF;
+  --text:#1A1816;--text2:#5C5750;--text3:#9B958C;
+  --accent:#16140F;--ok:#15803D;--err:#B3261B;
+  --serif:'Source Serif 4',Georgia,serif;--sans:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans)}
+.wrap{max-width:640px;margin:0 auto;padding:40px 24px 100px}
+h1{font-family:var(--serif);font-weight:500;font-size:28px;margin-bottom:6px}
+.sub{font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:32px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px}
+.card h2{font-family:var(--sans);font-size:14px;font-weight:600;margin-bottom:14px}
+.field{margin-bottom:14px}
+.field label{display:block;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:6px}
+.field input,.field textarea{width:100%;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;padding:10px 12px;border-radius:8px;resize:vertical}
+.field textarea{font-family:var(--serif);font-size:16px;line-height:1.6}
+.hint{font-family:var(--sans);font-size:12px;color:var(--text3);margin-top:6px}
+.row{display:flex;gap:10px;align-items:center}
+.row input{flex:1}
+button{border:none;font-family:var(--sans);font-weight:600;font-size:14px;padding:11px 18px;border-radius:9px;cursor:pointer}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-secondary{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-primary:disabled{opacity:.5;cursor:default}
+.status{font-family:var(--mono);font-size:13px;margin-top:14px;padding:10px 12px;border-radius:8px}
+.status.ok{background:rgba(21,128,61,0.1);color:var(--ok)}
+.status.err{background:rgba(179,38,27,0.1);color:var(--err)}
+.token-note{font-family:var(--sans);font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:14px}
+a.back{display:inline-block;margin-bottom:24px;font-family:var(--mono);font-size:13px;color:var(--text2)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+const{useState,useEffect}=React;
+const h=React.createElement;
+
+const OWNER='tny-me',REPO='nuxiens.org',BRANCH='main',PATH='entries.json';
+const API='https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/'+PATH;
+
+function b64EncodeUnicode(str){
+  const bytes=new TextEncoder().encode(str);
+  let bin='';
+  bytes.forEach(b=>bin+=String.fromCharCode(b));
+  return btoa(bin);
+}
+function b64DecodeUnicode(str){
+  const bin=atob(str);
+  const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
+function todayEs(){
+  const d=new Date();
+  const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  return d.getDate()+' de '+meses[d.getMonth()]+', '+d.getFullYear();
+}
+
+function App(){
+  const[token,setToken]=useState('');
+  const[showToken,setShowToken]=useState(false);
+  const[title,setTitle]=useState('');
+  const[date,setDate]=useState(todayEs());
+  const[excerpt,setExcerpt]=useState('');
+  const[body,setBody]=useState('');
+  const[quote,setQuote]=useState('');
+  const[busy,setBusy]=useState(false);
+  const[status,setStatus]=useState(null);
+
+  useEffect(()=>{
+    const saved=localStorage.getItem('nx-gh-token');
+    if(saved)setToken(saved);
+  },[]);
+
+  const saveToken=v=>{setToken(v);localStorage.setItem('nx-gh-token',v);};
+  const clearToken=()=>{setToken('');localStorage.removeItem('nx-gh-token');};
+
+  const publish=async()=>{
+    if(!token){setStatus({type:'err',msg:'Falta el token de GitHub.'});return;}
+    if(!title.trim()||!body.trim()){setStatus({type:'err',msg:'Falta título o texto.'});return;}
+    setBusy(true);setStatus(null);
+    try{
+      const headers={
+        'Authorization':'Bearer '+token,
+        'Accept':'application/vnd.github+json'
+      };
+      const getRes=await fetch(API+'?ref='+BRANCH,{headers});
+      if(!getRes.ok)throw new Error('No se pudo leer entries.json ('+getRes.status+')');
+      const getData=await getRes.json();
+      const current=JSON.parse(b64DecodeUnicode(getData.content.replace(/\n/g,'')));
+      const nextId=current.reduce((m,e)=>Math.max(m,e.id||0),0)+1;
+      const entry={
+        id:nextId,
+        title:title.trim(),
+        date:date.trim()||todayEs(),
+        excerpt:excerpt.trim()||body.trim().split('\n\n')[0].slice(0,200),
+        body:body.trim(),
+        quote:quote.trim()||excerpt.trim()||body.trim().split('\n\n')[0]
+      };
+      const updated=[...current,entry];
+      const content=b64EncodeUnicode(JSON.stringify(updated,null,2));
+      const putRes=await fetch(API,{
+        method:'PUT',
+        headers:{...headers,'Content-Type':'application/json'},
+        body:JSON.stringify({
+          message:'Add entry: '+entry.title,
+          content,
+          sha:getData.sha,
+          branch:BRANCH
+        })
+      });
+      if(!putRes.ok){
+        const err=await putRes.json().catch(()=>({}));
+        throw new Error(err.message||('Error al publicar ('+putRes.status+')'));
+      }
+      setStatus({type:'ok',msg:'Publicado. El sitio se actualizará en uno o dos minutos.'});
+      setTitle('');setExcerpt('');setBody('');setQuote('');setDate(todayEs());
+    }catch(e){
+      setStatus({type:'err',msg:e.message||'Error desconocido.'});
+    }finally{
+      setBusy(false);
+    }
+  };
+
+  return h('div',{className:'wrap'},
+    h('a',{className:'back',href:'/'},'← volver al sitio'),
+    h('h1',{},'Escribir'),
+    h('div',{className:'sub'},'publica directo en nuxiens.org · @jasachz'),
+
+    h('div',{className:'card'},
+      h('h2',{},'Token de GitHub'),
+      h('div',{className:'token-note'},
+        'Necesitas un Personal Access Token (classic) con permiso ',
+        h('code',{},'repo'),
+        ' de tu cuenta de GitHub. Se guarda solo en este navegador (localStorage), nunca se sube al repositorio.'
+      ),
+      h('div',{className:'row'},
+        h('input',{
+          type:showToken?'text':'password',
+          placeholder:'ghp_xxxxxxxxxxxxxxxx',
+          value:token,
+          onChange:e=>saveToken(e.target.value)
+        }),
+        h('button',{className:'btn-secondary',onClick:()=>setShowToken(!showToken)},showToken?'Ocultar':'Ver'),
+        h('button',{className:'btn-secondary',onClick:clearToken},'Borrar')
+      )
+    ),
+
+    h('div',{className:'card'},
+      h('h2',{},'Nueva lectura'),
+      h('div',{className:'field'},
+        h('label',{},'Título'),
+        h('input',{value:title,onChange:e=>setTitle(e.target.value)})
+      ),
+      h('div',{className:'field'},
+        h('label',{},'Fecha'),
+        h('input',{value:date,onChange:e=>setDate(e.target.value)})
+      ),
+      h('div',{className:'field'},
+        h('label',{},'Extracto (se muestra en la lista)'),
+        h('textarea',{rows:2,value:excerpt,onChange:e=>setExcerpt(e.target.value)}),
+        h('div',{className:'hint'},'Si lo dejas vacío, se usa el primer párrafo del texto.')
+      ),
+      h('div',{className:'field'},
+        h('label',{},'Texto completo'),
+        h('textarea',{rows:12,value:body,onChange:e=>setBody(e.target.value)}),
+        h('div',{className:'hint'},'Separa los párrafos con una línea vacía — cada párrafo se vuelve una imagen del carrusel.')
+      ),
+      h('div',{className:'field'},
+        h('label',{},'Cita para compartir (opcional)'),
+        h('textarea',{rows:2,value:quote,onChange:e=>setQuote(e.target.value)}),
+        h('div',{className:'hint'},'Frase corta sugerida al generar la imagen. Si la dejas vacía, se usa el extracto.')
+      ),
+      h('button',{className:'btn-primary',disabled:busy,onClick:publish},busy?'Publicando…':'Publicar'),
+      status&&h('div',{className:'status '+status.type},status.msg)
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
+</body>
+</html>
