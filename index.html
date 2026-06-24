@@ -356,12 +356,7 @@ function ShareStudio({entry,onClose}){
             },f.label))
           )
         ),
-        mode==='fragmento'
-          ?h('div',{className:'nx-field'},
-              h('label',{},'Texto / fragmento'),
-              h('textarea',{rows:4,value:quote,onChange:e=>setQuote(e.target.value)})
-            )
-          :h('div',{className:'nx-field'},
+        mode==='carrusel'&&h('div',{className:'nx-field'},
               h('label',{},'Texto'),
               h('div',{className:'nx-carousel-note'},'Se generará una imagen por cada párrafo del texto, lista para subir como carrusel.')
             ),
