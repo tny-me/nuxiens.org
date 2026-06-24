@@ -12,6 +12,7 @@
     "id": 2,
     "title": "Escritura de prueba",
     "date": "24 de junio, 2026",
+    "dateISO": "2026-06-24",
     "excerpt": "bla, bla",
     "body": "Esta es una escritura de prueba, en donde simplemente estoy escribiendo para probar un editor de escritura que pueda convertir los textos en imagenes y compartir en redes sociales.",
     "quote": "Intentando codificar la escritura"
