@@ -89,6 +89,7 @@ function esDateFromISO(iso){
 function App(){
   const[token,setToken]=useState('');
   const[showToken,setShowToken]=useState(false);
+  const[tokenOpen,setTokenOpen]=useState(false);
   const[dateISO,setDateISO]=useState(todayISO());
   const[excerpt,setExcerpt]=useState('');
   const[body,setBody]=useState('');
@@ -234,22 +235,27 @@ function App(){
       h('a',{className:'back',href:'/'},'← volver al sitio'),
       h('h1',{},'Escribir'),
       h('div',{className:'sub'},'publica directo en jasachz.com · @jasachz'),
-      h('div',{className:'card'},
-        h('h2',{},'Token de GitHub'),
-        h('div',{className:'token-note'},
-          'Necesitas un Personal Access Token (classic) con permiso ',
-          h('code',{},'repo'),
-          ' de tu cuenta de GitHub. Se guarda solo en este navegador (localStorage), nunca se sube al repositorio.'
+      h('div',{className:'card token-card'},
+        h('div',{className:'row',style:{justifyContent:'space-between'}},
+          h('h2',{style:{marginBottom:0}},token?'Token conectado ✓':'Token de GitHub'),
+          h('button',{className:'btn-secondary',onClick:()=>setTokenOpen(!tokenOpen)},tokenOpen?'Ocultar':(token?'Cambiar':'Configurar'))
         ),
-        h('div',{className:'row'},
-          h('input',{
-            type:showToken?'text':'password',
-            placeholder:'ghp_xxxxxxxxxxxxxxxx',
-            value:token,
-            onChange:e=>saveToken(e.target.value)
-          }),
-          h('button',{className:'btn-secondary',onClick:()=>setShowToken(!showToken)},showToken?'Ocultar':'Ver'),
-          h('button',{className:'btn-secondary',onClick:clearToken},'Borrar')
+        tokenOpen&&h('div',{style:{marginTop:14}},
+          h('div',{className:'token-note'},
+            'Necesitas un Personal Access Token (classic) con permiso ',
+            h('code',{},'repo'),
+            ' de tu cuenta de GitHub. Se guarda solo en este navegador (localStorage), nunca se sube al repositorio.'
+          ),
+          h('div',{className:'row'},
+            h('input',{
+              type:showToken?'text':'password',
+              placeholder:'ghp_xxxxxxxxxxxxxxxx',
+              value:token,
+              onChange:e=>saveToken(e.target.value)
+            }),
+            h('button',{className:'btn-secondary',onClick:()=>setShowToken(!showToken)},showToken?'Ocultar':'Ver'),
+            h('button',{className:'btn-secondary',onClick:clearToken},'Borrar')
+          )
         )
       )
     ),
@@ -267,19 +273,9 @@ function App(){
           h('div',{className:'hint'},'Se usa para mostrar la fecha en el sitio y para el código de la imagen (ej. 01:24.06.26).')
         ),
         h('div',{className:'field'},
-          h('label',{},'Extracto (se muestra en la lista)'),
-          h('textarea',{rows:2,value:excerpt,onChange:e=>setExcerpt(e.target.value)}),
-          h('div',{className:'hint'},'Si lo dejas vacío, se usa el primer párrafo del texto.')
-        ),
-        h('div',{className:'field'},
           h('label',{},'Texto completo'),
           h('textarea',{rows:12,value:body,onChange:e=>setBody(e.target.value)}),
           h('div',{className:'hint'},'Separa los párrafos con una línea vacía — cada párrafo se vuelve una imagen del carrusel.')
-        ),
-        h('div',{className:'field'},
-          h('label',{},'Cita para compartir (opcional)'),
-          h('textarea',{rows:2,value:quote,onChange:e=>setQuote(e.target.value)}),
-          h('div',{className:'hint'},'Frase corta sugerida al generar la imagen. Si la dejas vacía, se usa el extracto.')
         ),
         h('div',{className:'row'},
           h('button',{className:'btn-primary',disabled:busy,onClick:publish},busy?(editingId?'Guardando…':'Publicando…'):(editingId?'Guardar cambios':'Publicar')),
