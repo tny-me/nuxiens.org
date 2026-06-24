@@ -43,35 +43,18 @@ a{color:inherit;text-decoration:none}
 .nx-entry:last-child{border-bottom:1px solid var(--border)}
 .nx-entry-code{font-family:var(--mono);font-size:12px;color:var(--accent);flex:0 0 auto;width:80px}
 .nx-entry-body{flex:1;min-width:0}
-.nx-entry h2{font-family:var(--serif);font-weight:500;font-size:22px;line-height:1.32;margin-bottom:8px;cursor:pointer;transition:color .15s}
-.nx-entry h2:hover{color:var(--accent)}
+.nx-entry h2{font-family:var(--serif);font-weight:500;font-size:22px;line-height:1.32;margin-bottom:8px}
 .nx-entry-text p{font-family:var(--serif);font-size:15px;line-height:1.65;color:var(--text2);margin-bottom:10px}
-.nx-entry-text{position:relative}
 .nx-entry-actions{display:flex;align-items:center;gap:14px;margin-top:8px;flex-wrap:wrap}
-.nx-entry-more{border:none;background:none;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.3px;padding:0}
-.nx-entry-more:hover{color:var(--accent)}
 .nx-entry-share{border:1px solid var(--border);background:none;cursor:pointer;font-family:var(--sans);font-size:12px;color:var(--text2);letter-spacing:.2px;padding:6px 12px;border-radius:20px}
 .nx-entry-share:hover{border-color:var(--accent);color:var(--accent)}
-@media (max-width:879px){
-  .nx-entry-text{max-height:120px;overflow:hidden}
-  .nx-entry-text::after{content:'';position:absolute;left:0;right:0;bottom:0;height:42px;background:linear-gradient(to bottom,transparent,var(--bg))}
-}
 @media (min-width:880px){
   .nx-list{max-width:1080px;display:grid;grid-template-columns:1fr 1fr;column-gap:48px;position:relative}
   .nx-list::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--border)}
   .nx-entry{align-items:flex-start}
 }
 footer{max-width:680px;margin:0 auto;padding:26px 20px 50px;border-top:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--text3);display:flex;justify-content:space-between}
-.nx-reader-overlay{position:fixed;inset:0;background:var(--bg);z-index:50;overflow-y:auto;animation:nxfade .18s ease}
 @keyframes nxfade{from{opacity:0}to{opacity:1}}
-.nx-reader{max-width:620px;margin:0 auto;padding:26px 20px 90px}
-.nx-back{display:inline-flex;align-items:center;gap:6px;border:none;background:transparent;color:var(--text2);font-family:var(--mono);font-size:12px;cursor:pointer;margin-bottom:30px}
-.nx-back:hover{color:var(--text)}
-.nx-reader-date{font-family:var(--mono);font-size:12px;color:var(--accent);margin-bottom:12px}
-.nx-reader h1{font-family:var(--serif);font-weight:500;font-size:clamp(26px,6vw,34px);line-height:1.28;letter-spacing:-.2px;margin-bottom:26px}
-.nx-reader p{font-family:var(--serif);font-size:18px;line-height:1.8;color:var(--text);margin-bottom:20px}
-.nx-share-btn{margin-top:26px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:var(--sans);font-weight:500;font-size:13px;padding:10px 16px;border-radius:9px;cursor:pointer}
-.nx-share-btn:hover{border-color:var(--accent);color:var(--accent)}
 .nx-studio-overlay{position:fixed;inset:0;background:rgba(20,17,12,.6);z-index:60;display:flex;align-items:center;justify-content:center;padding:14px;animation:nxfade .15s ease}
 .nx-studio{background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:880px;width:100%;max-height:92vh;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:0}
 @media (max-width:720px){.nx-studio{grid-template-columns:1fr}}
@@ -102,8 +85,6 @@ footer{max-width:680px;margin:0 auto;padding:26px 20px 50px;border-top:1px solid
 @media (max-width:480px){
   .nx-entry{flex-direction:column;gap:6px;padding:20px 0}
   .nx-entry-code{width:auto}
-  .nx-reader h1{margin-bottom:20px}
-  .nx-reader p{font-size:17px}
 }
 </style>
 </head>
@@ -421,24 +402,8 @@ function ShareStudio({entry,onClose}){
   );
 }
 
-function Reader({entry,onClose}){
-  const paragraphs=entry.body.split('\n\n').filter(Boolean);
-  const[studio,setStudio]=useState(false);
-  return h('div',{className:'nx-reader-overlay'},
-    studio&&h(ShareStudio,{entry,onClose:()=>setStudio(false)}),
-    h('div',{className:'nx-reader'},
-      h('button',{className:'nx-back',onClick:onClose},'← volver'),
-      h('div',{className:'nx-reader-date'},entry.date),
-      h('h1',{},entry.title),
-      paragraphs.map((p,i)=>h('p',{key:i},p)),
-      h('button',{className:'nx-share-btn',onClick:()=>setStudio(true)},'↗ Crear imagen o carrusel')
-    )
-  );
-}
-
 function App(){
   const[dark,setDark]=useState(false);
-  const[open,setOpen]=useState(null);
   const[studioEntry,setStudioEntry]=useState(null);
   const[entries,setEntries]=useState(ENTRIES_FALLBACK);
 
@@ -471,12 +436,11 @@ function App(){
       sorted.map(entry=>h('li',{key:entry.id,className:'nx-entry'},
         h('div',{className:'nx-entry-code'},entryCode(entry)||entry.date),
         h('div',{className:'nx-entry-body'},
-          h('h2',{onClick:()=>setOpen(entry)},entry.title),
+          h('h2',{},entry.title),
           h('div',{className:'nx-entry-text'},
             entry.body.split('\n\n').filter(Boolean).map((p,i)=>h('p',{key:i},p))
           ),
           h('div',{className:'nx-entry-actions'},
-            h('button',{className:'nx-entry-more',onClick:()=>setOpen(entry)},'leer completo →'),
             h('button',{className:'nx-entry-share',onClick:()=>setStudioEntry(entry)},'✦ Generar imágenes')
           )
         )
@@ -486,7 +450,6 @@ function App(){
       h('span',{},'@jasachz'),
       h('span',{},'© 2026')
     ),
-    open&&h(Reader,{entry:open,onClose:()=>setOpen(null)}),
     studioEntry&&h(ShareStudio,{entry:studioEntry,onClose:()=>setStudioEntry(null)})
   );
 }
