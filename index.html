@@ -163,11 +163,11 @@ function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
   lines.forEach((ln,i)=>c.fillText(ln,W/2,startY+i*lh));
   try{c.letterSpacing='0px';}catch(e){}
 
-  c.font='500 '+Math.round(fontSize*0.26)+'px Inter,sans-serif';
+  c.font='500 '+Math.round(W*0.014)+'px Inter,sans-serif';
   c.fillStyle=fgMuted;c.textAlign='center';
-  c.fillText(trackedText(author||'jasachz'),W/2,startY+blockH+Math.round(fontSize*0.9));
+  c.fillText(trackedText(author||'jasachz'),W/2,startY+blockH+Math.round(W*0.035));
 
-  c.font='500 '+Math.round(W*0.012)+'px Inter,sans-serif';
+  c.font='600 '+Math.round(W*0.017)+'px Inter,sans-serif';
   c.fillStyle=fgMuted;c.textAlign='center';
   c.fillText(trackedText('@jasachz'),W/2,H-Math.round(H*0.05));
 
