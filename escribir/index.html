@@ -15,7 +15,10 @@
   --serif:'Source Serif 4',Georgia,serif;--sans:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
 }
 html,body{background:var(--bg);color:var(--text);font-family:var(--sans)}
-.wrap{max-width:640px;margin:0 auto;padding:40px 24px 100px}
+.wrap{max-width:1100px;margin:0 auto;padding:40px 24px 100px}
+.header-col{max-width:640px;margin:0 auto 20px}
+.editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+@media (max-width:860px){.editor-grid{grid-template-columns:1fr}}
 h1{font-family:var(--serif);font-weight:500;font-size:28px;margin-bottom:6px}
 .sub{font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:32px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px}
@@ -227,74 +230,77 @@ function App(){
   };
 
   return h('div',{className:'wrap'},
-    h('a',{className:'back',href:'/'},'← volver al sitio'),
-    h('h1',{},'Escribir'),
-    h('div',{className:'sub'},'publica directo en jasachz.com · @jasachz'),
-
-    h('div',{className:'card'},
-      h('h2',{},'Token de GitHub'),
-      h('div',{className:'token-note'},
-        'Necesitas un Personal Access Token (classic) con permiso ',
-        h('code',{},'repo'),
-        ' de tu cuenta de GitHub. Se guarda solo en este navegador (localStorage), nunca se sube al repositorio.'
-      ),
-      h('div',{className:'row'},
-        h('input',{
-          type:showToken?'text':'password',
-          placeholder:'ghp_xxxxxxxxxxxxxxxx',
-          value:token,
-          onChange:e=>saveToken(e.target.value)
-        }),
-        h('button',{className:'btn-secondary',onClick:()=>setShowToken(!showToken)},showToken?'Ocultar':'Ver'),
-        h('button',{className:'btn-secondary',onClick:clearToken},'Borrar')
+    h('div',{className:'header-col'},
+      h('a',{className:'back',href:'/'},'← volver al sitio'),
+      h('h1',{},'Escribir'),
+      h('div',{className:'sub'},'publica directo en jasachz.com · @jasachz'),
+      h('div',{className:'card'},
+        h('h2',{},'Token de GitHub'),
+        h('div',{className:'token-note'},
+          'Necesitas un Personal Access Token (classic) con permiso ',
+          h('code',{},'repo'),
+          ' de tu cuenta de GitHub. Se guarda solo en este navegador (localStorage), nunca se sube al repositorio.'
+        ),
+        h('div',{className:'row'},
+          h('input',{
+            type:showToken?'text':'password',
+            placeholder:'ghp_xxxxxxxxxxxxxxxx',
+            value:token,
+            onChange:e=>saveToken(e.target.value)
+          }),
+          h('button',{className:'btn-secondary',onClick:()=>setShowToken(!showToken)},showToken?'Ocultar':'Ver'),
+          h('button',{className:'btn-secondary',onClick:clearToken},'Borrar')
+        )
       )
     ),
 
-    h('div',{className:'card'},
-      h('h2',{},'Entradas publicadas'),
-      loadingList&&h('div',{className:'empty-note'},'Cargando…'),
-      !loadingList&&!entries.length&&h('div',{className:'empty-note'},'Todavía no hay entradas.'),
-      !loadingList&&entries.map(entry=>h('div',{key:entry.id,className:'entry-item'},
-        h('div',{className:'meta'},'#'+entry.id+' · '+(entry.date||entry.dateISO||'')),
-        h('div',{className:'excerpt'},entry.excerpt||(entry.body||'').slice(0,160)),
-        h('div',{className:'actions'},
-          h('button',{className:'btn-secondary',disabled:busy,onClick:()=>startEdit(entry)},'Editar'),
-          h('button',{className:'btn-danger',disabled:busy,onClick:()=>removeEntry(entry)},'Borrar')
-        )
-      ))
-    ),
+    h('div',{className:'editor-grid'},
+      h('div',{className:'card'},
+        h('h2',{},editingId?'Editar entrada #'+editingId:'Nueva lectura'),
+        editingId&&h('div',{className:'editing-banner'},
+          h('span',{},'Editando la entrada #'+editingId+'.'),
+          h('button',{onClick:resetForm},'Cancelar')
+        ),
+        h('div',{className:'field'},
+          h('label',{},'Fecha de publicación'),
+          h('input',{type:'date',value:dateISO,onChange:e=>setDateISO(e.target.value)}),
+          h('div',{className:'hint'},'Se usa para mostrar la fecha en el sitio y para el código de la imagen (ej. 01:24.06.26).')
+        ),
+        h('div',{className:'field'},
+          h('label',{},'Extracto (se muestra en la lista)'),
+          h('textarea',{rows:2,value:excerpt,onChange:e=>setExcerpt(e.target.value)}),
+          h('div',{className:'hint'},'Si lo dejas vacío, se usa el primer párrafo del texto.')
+        ),
+        h('div',{className:'field'},
+          h('label',{},'Texto completo'),
+          h('textarea',{rows:12,value:body,onChange:e=>setBody(e.target.value)}),
+          h('div',{className:'hint'},'Separa los párrafos con una línea vacía — cada párrafo se vuelve una imagen del carrusel.')
+        ),
+        h('div',{className:'field'},
+          h('label',{},'Cita para compartir (opcional)'),
+          h('textarea',{rows:2,value:quote,onChange:e=>setQuote(e.target.value)}),
+          h('div',{className:'hint'},'Frase corta sugerida al generar la imagen. Si la dejas vacía, se usa el extracto.')
+        ),
+        h('div',{className:'row'},
+          h('button',{className:'btn-primary',disabled:busy,onClick:publish},busy?(editingId?'Guardando…':'Publicando…'):(editingId?'Guardar cambios':'Publicar')),
+          editingId&&h('button',{className:'btn-secondary',disabled:busy,onClick:resetForm},'Cancelar')
+        ),
+        status&&h('div',{className:'status '+status.type},status.msg)
+      ),
 
-    h('div',{className:'card'},
-      h('h2',{},editingId?'Editar entrada #'+editingId:'Nueva lectura'),
-      editingId&&h('div',{className:'editing-banner'},
-        h('span',{},'Editando la entrada #'+editingId+'.'),
-        h('button',{onClick:resetForm},'Cancelar')
-      ),
-      h('div',{className:'field'},
-        h('label',{},'Fecha de publicación'),
-        h('input',{type:'date',value:dateISO,onChange:e=>setDateISO(e.target.value)}),
-        h('div',{className:'hint'},'Se usa para mostrar la fecha en el sitio y para el código de la imagen (ej. 01:24.06.26).')
-      ),
-      h('div',{className:'field'},
-        h('label',{},'Extracto (se muestra en la lista)'),
-        h('textarea',{rows:2,value:excerpt,onChange:e=>setExcerpt(e.target.value)}),
-        h('div',{className:'hint'},'Si lo dejas vacío, se usa el primer párrafo del texto.')
-      ),
-      h('div',{className:'field'},
-        h('label',{},'Texto completo'),
-        h('textarea',{rows:12,value:body,onChange:e=>setBody(e.target.value)}),
-        h('div',{className:'hint'},'Separa los párrafos con una línea vacía — cada párrafo se vuelve una imagen del carrusel.')
-      ),
-      h('div',{className:'field'},
-        h('label',{},'Cita para compartir (opcional)'),
-        h('textarea',{rows:2,value:quote,onChange:e=>setQuote(e.target.value)}),
-        h('div',{className:'hint'},'Frase corta sugerida al generar la imagen. Si la dejas vacía, se usa el extracto.')
-      ),
-      h('div',{className:'row'},
-        h('button',{className:'btn-primary',disabled:busy,onClick:publish},busy?(editingId?'Guardando…':'Publicando…'):(editingId?'Guardar cambios':'Publicar')),
-        editingId&&h('button',{className:'btn-secondary',disabled:busy,onClick:resetForm},'Cancelar')
-      ),
-      status&&h('div',{className:'status '+status.type},status.msg)
+      h('div',{className:'card'},
+        h('h2',{},'Entradas publicadas'),
+        loadingList&&h('div',{className:'empty-note'},'Cargando…'),
+        !loadingList&&!entries.length&&h('div',{className:'empty-note'},'Todavía no hay entradas.'),
+        !loadingList&&entries.map(entry=>h('div',{key:entry.id,className:'entry-item'},
+          h('div',{className:'meta'},'#'+entry.id+' · '+(entry.date||entry.dateISO||'')),
+          h('div',{className:'excerpt'},entry.excerpt||(entry.body||'').slice(0,160)),
+          h('div',{className:'actions'},
+            h('button',{className:'btn-secondary',disabled:busy,onClick:()=>startEdit(entry)},'Editar'),
+            h('button',{className:'btn-danger',disabled:busy,onClick:()=>removeEntry(entry)},'Borrar')
+          )
+        ))
+      )
     )
   );
 }
