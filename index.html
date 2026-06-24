@@ -155,11 +155,6 @@ function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
   c.fillStyle=grad;c.fillRect(0,0,W,H);
   c.textBaseline='alphabetic';
 
-  const glow=c.createRadialGradient(W*0.86,H*0.12,0,W*0.86,H*0.12,W*0.4);
-  glow.addColorStop(0,accent+'2e');
-  glow.addColorStop(1,accent+'00');
-  c.fillStyle=glow;c.fillRect(0,0,W,H);
-
   const fontSize=Math.round(W*0.024);
   const lh=Math.round(fontSize*1.45);
   const maxW=Math.round(W*0.62);
