@@ -143,6 +143,31 @@ function trackedText(s){
   return (s||'').toUpperCase().split('').join(' ');
 }
 
+function fitQuote(c,text,W,H){
+  const fontStack='-apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,sans-serif';
+  const maxFont=Math.round(W*0.024),minFont=Math.round(W*0.013);
+  const maxW=Math.round(W*0.62);
+  const footer=Math.round(W*0.022)+Math.round(W*0.03)+Math.round(W*0.014*1.3);
+  const safeH=Math.max(minFont*1.45,H-Math.round(W*0.34)-footer);
+  let fontSize=maxFont,lines,lh,blockH;
+  for(;fontSize>=minFont;fontSize--){
+    c.font='400 '+fontSize+'px '+fontStack;
+    lh=Math.round(fontSize*1.45);
+    lines=getLines(c,text,maxW,200);
+    blockH=lines.length*lh;
+    if(blockH<=safeH)break;
+  }
+  if(blockH>safeH){
+    fontSize=minFont;
+    c.font='400 '+fontSize+'px '+fontStack;
+    lh=Math.round(fontSize*1.45);
+    const maxLines=Math.max(1,Math.floor(safeH/lh));
+    lines=getLines(c,text,maxW,maxLines);
+    blockH=lines.length*lh;
+  }
+  return{fontSize,lines,lh,blockH,maxW,fontStack,footer};
+}
+
 function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
   const bgA=dark?'#000000':'#FFFFFF';
   const bgB=dark?'#111114':'#F4F3F0';
@@ -155,15 +180,11 @@ function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
   c.fillStyle=grad;c.fillRect(0,0,W,H);
   c.textBaseline='alphabetic';
 
-  const fontSize=Math.round(W*0.024);
-  const lh=Math.round(fontSize*1.45);
-  const maxW=Math.round(W*0.62);
-  const lines=getLines(c,text,maxW,10);
-  const blockH=lines.length*lh;
-  const cy=Math.round(H/2);
-  const startY=cy-blockH/2+lh*0.3;
+  const{fontSize,lines,lh,blockH,fontStack,footer}=fitQuote(c,text,W,H);
+  const totalH=blockH+footer;
+  const startY=Math.round(H/2-totalH/2+lh*0.3);
 
-  c.font='400 '+fontSize+'px -apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,sans-serif';
+  c.font='400 '+fontSize+'px '+fontStack;
   try{c.letterSpacing='-0.3px';}catch(e){}
   c.fillStyle=fg;c.textAlign='center';
   lines.forEach((ln,i)=>c.fillText(ln,W/2,startY+i*lh));
