@@ -16,5 +16,14 @@
     "excerpt": "bla, bla",
     "body": "Esta es una escritura de prueba, en donde simplemente estoy escribiendo para probar un editor de escritura que pueda convertir los textos en imagenes y compartir en redes sociales.",
     "quote": "Intentando codificar la escritura"
+  },
+  {
+    "id": 3,
+    "title": "Un día",
+    "date": "24 de junio, 2026",
+    "dateISO": "2026-06-24",
+    "excerpt": "Un día vas a contar esa parte de tu vida en la que todo se sentía tan difícil que lo único que sabias hacer era orar. No tenias respuestas a lo que te pasaba o sucedía, solo fe y miedo. ",
+    "body": "Un día vas a contar esa parte de tu vida en la que todo se sentía tan difícil que lo único que sabias hacer era orar. No tenias respuestas a lo que te pasaba o sucedía, solo fe y miedo. \n\nPero era ese miedo de perder la esperanza y rendirte. Y sin darte cuenta, Dios un día vio todo lo que habías soportado, y empezó actuar. \n\nNunca te rindas, algún día, alguien necesitara escuchar tu historia, necesitara escuchar como saliste de donde estabas, y hasta donde Dios se tuvo que meter para sacarte de allí.",
+    "quote": "Un día vas a contar esa parte de tu vida en la que todo se sentía tan difícil que lo único que sabias hacer era orar. No tenias respuestas a lo que te pasaba o sucedía, solo fe y miedo. "
   }
 ]
