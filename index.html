@@ -155,12 +155,10 @@ function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
   c.fillStyle=grad;c.fillRect(0,0,W,H);
   c.textBaseline='alphabetic';
 
-  const m=Math.round(W*0.075),bl=Math.round(W*0.045);
-  c.strokeStyle=accent;c.lineWidth=Math.max(2,Math.round(W*0.0016));
-  c.beginPath();
-  c.moveTo(m,m+bl);c.lineTo(m,m);c.lineTo(m+bl,m);
-  c.moveTo(W-m-bl,H-m);c.lineTo(W-m,H-m);c.lineTo(W-m,H-m-bl);
-  c.stroke();
+  const glow=c.createRadialGradient(W*0.86,H*0.12,0,W*0.86,H*0.12,W*0.4);
+  glow.addColorStop(0,accent+'2e');
+  glow.addColorStop(1,accent+'00');
+  c.fillStyle=glow;c.fillRect(0,0,W,H);
 
   const fontSize=Math.round(W*0.024);
   const lh=Math.round(fontSize*1.45);
@@ -170,21 +168,19 @@ function renderSlide(c,W,H,{text,author,accent,dark,index,total}){
   const cy=Math.round(H/2);
   const startY=cy-blockH/2+lh*0.3;
 
-  c.fillStyle=accent;c.globalAlpha=0.9;
-  c.font='italic 400 '+Math.round(W*0.075)+'px Georgia,serif';
-  c.textAlign='left';
-  c.fillText('“',Math.round(W/2-maxW/2-W*0.012),Math.round(startY-lh*0.5));
-  c.globalAlpha=1;
-
   c.font='400 '+fontSize+'px -apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,sans-serif';
   try{c.letterSpacing='-0.3px';}catch(e){}
   c.fillStyle=fg;c.textAlign='center';
   lines.forEach((ln,i)=>c.fillText(ln,W/2,startY+i*lh));
   try{c.letterSpacing='0px';}catch(e){}
 
+  const lineY=startY+blockH+Math.round(W*0.022);
+  c.strokeStyle=accent;c.lineWidth=Math.max(1,Math.round(W*0.0014));
+  c.beginPath();c.moveTo(W/2-Math.round(W*0.022),lineY);c.lineTo(W/2+Math.round(W*0.022),lineY);c.stroke();
+
   c.font='500 '+Math.round(W*0.014)+'px Inter,sans-serif';
   c.fillStyle=fgMuted;c.textAlign='center';
-  c.fillText(trackedText(author||'jasachz'),W/2,startY+blockH+Math.round(W*0.035));
+  c.fillText(trackedText(author||'jasachz'),W/2,lineY+Math.round(W*0.03));
 
   if(total>1){
     c.font='500 '+Math.round(W*0.013)+'px "JetBrains Mono",monospace';
