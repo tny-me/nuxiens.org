@@ -38,15 +38,28 @@ a{color:inherit;text-decoration:none}
 .nx-hero{max-width:680px;margin:0 auto;padding:28px 20px 8px}
 .nx-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)}
 .nx-list{max-width:680px;margin:0 auto;padding:8px 20px 90px;list-style:none}
-.nx-entry{border-top:1px solid var(--border);padding:22px 0;cursor:pointer;display:flex;gap:18px;align-items:baseline}
+.nx-entry{border-top:1px solid var(--border);padding:22px 0;display:flex;gap:18px;align-items:baseline}
 .nx-entry:last-child{border-bottom:1px solid var(--border)}
 .nx-entry-code{font-family:var(--mono);font-size:12px;color:var(--accent);flex:0 0 auto;width:80px}
 .nx-entry-body{flex:1;min-width:0}
-.nx-entry h2{font-family:var(--serif);font-weight:500;font-size:22px;line-height:1.32;margin-bottom:8px;transition:color .15s}
-.nx-entry:hover h2{color:var(--accent)}
-.nx-entry p{font-family:var(--serif);font-style:italic;font-size:15px;line-height:1.55;color:var(--text2)}
-.nx-entry-more{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.3px}
-.nx-entry:hover .nx-entry-more{color:var(--accent)}
+.nx-entry h2{font-family:var(--serif);font-weight:500;font-size:22px;line-height:1.32;margin-bottom:8px;cursor:pointer;transition:color .15s}
+.nx-entry h2:hover{color:var(--accent)}
+.nx-entry-text p{font-family:var(--serif);font-size:15px;line-height:1.65;color:var(--text2);margin-bottom:10px}
+.nx-entry-text{position:relative}
+.nx-entry-actions{display:flex;align-items:center;gap:14px;margin-top:8px;flex-wrap:wrap}
+.nx-entry-more{border:none;background:none;cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--text3);letter-spacing:.3px;padding:0}
+.nx-entry-more:hover{color:var(--accent)}
+.nx-entry-share{border:1px solid var(--border);background:none;cursor:pointer;font-family:var(--sans);font-size:12px;color:var(--text2);letter-spacing:.2px;padding:6px 12px;border-radius:20px}
+.nx-entry-share:hover{border-color:var(--accent);color:var(--accent)}
+@media (max-width:879px){
+  .nx-entry-text{max-height:120px;overflow:hidden}
+  .nx-entry-text::after{content:'';position:absolute;left:0;right:0;bottom:0;height:42px;background:linear-gradient(to bottom,transparent,var(--bg))}
+}
+@media (min-width:880px){
+  .nx-list{max-width:1080px;display:grid;grid-template-columns:1fr 1fr;column-gap:48px;position:relative}
+  .nx-list::before{content:'';position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--border)}
+  .nx-entry{align-items:flex-start}
+}
 footer{max-width:680px;margin:0 auto;padding:26px 20px 50px;border-top:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--text3);display:flex;justify-content:space-between}
 .nx-reader-overlay{position:fixed;inset:0;background:var(--bg);z-index:50;overflow-y:auto;animation:nxfade .18s ease}
 @keyframes nxfade{from{opacity:0}to{opacity:1}}
@@ -425,6 +438,7 @@ function Reader({entry,onClose}){
 function App(){
   const[dark,setDark]=useState(false);
   const[open,setOpen]=useState(null);
+  const[studioEntry,setStudioEntry]=useState(null);
   const[entries,setEntries]=useState(ENTRIES_FALLBACK);
 
   useEffect(()=>{
@@ -453,12 +467,17 @@ function App(){
       h('div',{className:'nx-eyebrow'},'escritos personales')
     ),
     h('ul',{className:'nx-list'},
-      sorted.map(entry=>h('li',{key:entry.id,className:'nx-entry',onClick:()=>setOpen(entry)},
+      sorted.map(entry=>h('li',{key:entry.id,className:'nx-entry'},
         h('div',{className:'nx-entry-code'},entryCode(entry)||entry.date),
         h('div',{className:'nx-entry-body'},
-          h('h2',{},entry.title),
-          h('p',{},entry.excerpt),
-          h('span',{className:'nx-entry-more'},'leer →')
+          h('h2',{onClick:()=>setOpen(entry)},entry.title),
+          h('div',{className:'nx-entry-text'},
+            entry.body.split('\n\n').filter(Boolean).map((p,i)=>h('p',{key:i},p))
+          ),
+          h('div',{className:'nx-entry-actions'},
+            h('button',{className:'nx-entry-more',onClick:()=>setOpen(entry)},'leer completo →'),
+            h('button',{className:'nx-entry-share',onClick:()=>setStudioEntry(entry)},'✦ Generar imágenes')
+          )
         )
       ))
     ),
@@ -466,7 +485,8 @@ function App(){
       h('span',{},'@jasachz'),
       h('span',{},'© 2026')
     ),
-    open&&h(Reader,{entry:open,onClose:()=>setOpen(null)})
+    open&&h(Reader,{entry:open,onClose:()=>setOpen(null)}),
+    studioEntry&&h(ShareStudio,{entry:studioEntry,onClose:()=>setStudioEntry(null)})
   );
 }
 
