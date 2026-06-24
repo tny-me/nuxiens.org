@@ -35,14 +35,13 @@ a{color:inherit;text-decoration:none}
 .nx-logo span{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:var(--accent);color:#fff;font-size:13px}
 .nx-toggle{border:1px solid var(--border);background:transparent;color:var(--text2);width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
 .nx-toggle:hover{color:var(--text)}
-.nx-hero{max-width:760px;margin:0 auto;padding:40px 24px 56px}
-.nx-eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
-.nx-hero h1{font-family:var(--serif);font-weight:500;font-size:42px;line-height:1.2;letter-spacing:-.5px;margin-bottom:16px}
-.nx-hero p{font-family:var(--serif);font-size:18px;line-height:1.6;color:var(--text2);max-width:540px}
+.nx-hero{max-width:760px;margin:0 auto;padding:40px 24px 32px}
+.nx-eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--accent)}
 .nx-list{max-width:760px;margin:0 auto;padding:0 24px 100px;list-style:none}
-.nx-entry{border-top:1px solid var(--border);padding:32px 0;cursor:pointer}
+.nx-entry{border-top:1px solid var(--border);padding:26px 0;cursor:pointer;display:flex;gap:22px;align-items:baseline}
 .nx-entry:last-child{border-bottom:1px solid var(--border)}
-.nx-entry-date{font-family:var(--mono);font-size:12px;color:var(--text3);margin-bottom:10px}
+.nx-entry-code{font-family:var(--mono);font-size:12px;color:var(--text3);flex:0 0 auto;width:92px}
+.nx-entry-body{flex:1;min-width:0}
 .nx-entry h2{font-family:var(--serif);font-weight:500;font-size:25px;line-height:1.3;margin-bottom:10px;transition:color .15s}
 .nx-entry:hover h2{color:var(--accent)}
 .nx-entry p{font-family:var(--serif);font-size:16px;line-height:1.6;color:var(--text2)}
@@ -444,16 +443,16 @@ function App(){
       h('button',{className:'nx-toggle',onClick:()=>setDark(!dark)},dark?'☀':'☾')
     ),
     h('div',{className:'nx-hero'},
-      h('div',{className:'nx-eyebrow'},'escritos personales'),
-      h('h1',{},'Ideas, sin agenda editorial.'),
-      h('p',{},'Tecnología, pensamiento y todo lo que no cabe en una categoría. Cada lectura puede convertirse en una imagen para compartir.')
+      h('div',{className:'nx-eyebrow'},'escritos personales')
     ),
     h('ul',{className:'nx-list'},
       sorted.map(entry=>h('li',{key:entry.id,className:'nx-entry',onClick:()=>setOpen(entry)},
-        h('div',{className:'nx-entry-date'},entry.date),
-        h('h2',{},entry.title),
-        h('p',{},entry.excerpt),
-        h('span',{className:'nx-entry-more'},'leer →')
+        h('div',{className:'nx-entry-code'},entryCode(entry)||entry.date),
+        h('div',{className:'nx-entry-body'},
+          h('h2',{},entry.title),
+          h('p',{},entry.excerpt),
+          h('span',{className:'nx-entry-more'},'leer →')
+        )
       ))
     ),
     h('footer',{},
