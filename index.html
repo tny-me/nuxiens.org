@@ -29,6 +29,7 @@
   --accent:#C68A78;
 }
 html,body{background:var(--bg);color:var(--text);font-family:var(--sans);transition:background .2s,color .2s;-webkit-text-size-adjust:100%}
+.nx-app{background:var(--bg);color:var(--text);min-height:100vh;transition:background .2s,color .2s}
 a{color:inherit;text-decoration:none}
 .nx-nav{display:flex;align-items:center;justify-content:space-between;max-width:680px;margin:0 auto;padding:22px 20px;border-bottom:1px solid var(--border)}
 .nx-logo{display:flex;align-items:baseline;gap:8px;font-family:var(--serif);font-weight:500;font-style:italic;font-size:17px;letter-spacing:.2px;color:var(--text)}
@@ -458,7 +459,7 @@ function App(){
 
   const sorted=useMemo(()=>[...entries].sort((a,b)=>b.id-a.id),[entries]);
 
-  return h('div',{'data-dark':dark?'1':undefined},
+  return h('div',{className:'nx-app','data-dark':dark?'1':undefined},
     h('nav',{className:'nx-nav'},
       h('div',{className:'nx-logo'},'jasachz',h('span',{},'·escritos')),
       h('button',{className:'nx-toggle',onClick:()=>setDark(!dark)},dark?'☀':'☾')
