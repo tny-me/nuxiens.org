@@ -6,5 +6,13 @@
     "excerpt": "Un espacio personal de escritura — ideas, observaciones y reflexiones sobre tecnología y pensamiento, sin agenda editorial.",
     "body": "Este espacio existe para lo que yo mismo tengo que decir.\n\nNo hay aquí una promesa de frecuencia ni de tema fijo. Habrá tecnología, pero también habrá ideas que no caben en ninguna categoría — observaciones sobre cómo pensamos, cómo construimos, cómo decidimos.\n\nCada texto que publique aquí podrá convertirse en una imagen para compartir. La intención no es la viralidad, sino que una idea, si vale la pena, pueda viajar más allá de esta página.",
     "quote": "Este espacio existe ahora para lo que yo mismo tengo que decir."
+  },
+  {
+    "id": 2,
+    "title": "Escritura de prueba",
+    "date": "24 de junio, 2026",
+    "excerpt": "bla, bla",
+    "body": "Esta es una escritura de prueba, en donde simplemente estoy escribiendo para probar un editor de escritura que pueda convertir los textos en imagenes y compartir en redes sociales.",
+    "quote": "Intentando codificar la escritura"
   }
 ]
