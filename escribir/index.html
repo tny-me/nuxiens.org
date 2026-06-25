@@ -105,6 +105,7 @@ function App(){
   const[excerpt,setExcerpt]=useState('');
   const[body,setBody]=useState('');
   const[quote,setQuote]=useState('');
+  const[topic,setTopic]=useState('');
   const[busy,setBusy]=useState(false);
   const[status,setStatus]=useState(null);
   const[entries,setEntries]=useState([]);
@@ -134,7 +135,7 @@ function App(){
   useEffect(()=>{loadEntries();},[]);
 
   const resetForm=()=>{
-    setEditingId(null);setExcerpt('');setBody('');setQuote('');setDateISO(todayISO());
+    setEditingId(null);setExcerpt('');setBody('');setQuote('');setDateISO(todayISO());setTopic('');
   };
 
   const startEdit=entry=>{
@@ -143,6 +144,7 @@ function App(){
     setExcerpt(entry.excerpt||'');
     setBody(entry.body||'');
     setQuote(entry.quote||'');
+    setTopic(entry.topic||'');
     setStatus(null);
     window.scrollTo({top:0,behavior:'smooth'});
   };
@@ -166,7 +168,8 @@ function App(){
         dateISO:iso,
         excerpt:excerpt.trim()||body.trim().split('\n\n')[0].slice(0,200),
         body:body.trim(),
-        quote:quote.trim()||excerpt.trim()||body.trim().split('\n\n')[0]
+        quote:quote.trim()||excerpt.trim()||body.trim().split('\n\n')[0],
+        topic:topic.trim()
       };
       let updated,message;
       if(editingId){
@@ -291,6 +294,11 @@ function App(){
           h('textarea',{rows:12,value:body,onChange:e=>setBody(e.target.value)}),
           h('div',{className:'hint'},'Separa los párrafos con una línea vacía — cada párrafo se vuelve una imagen del carrusel.')
         ),
+        h('div',{className:'field'},
+          h('label',{},'Tema (opcional)'),
+          h('input',{type:'text',value:topic,placeholder:'ej. fe, escritura, reflexión',onChange:e=>setTopic(e.target.value)}),
+          h('div',{className:'hint'},'Permite filtrar las entradas por tema en el sitio. Déjalo vacío si no aplica.')
+        ),
         h('div',{className:'row'},
           h('button',{className:'btn-primary',disabled:busy,onClick:publish},busy?(editingId?'Guardando…':'Publicando…'):(editingId?'Guardar cambios':'Publicar')),
           editingId&&h('button',{className:'btn-secondary',disabled:busy,onClick:resetForm},'Cancelar')
@@ -303,7 +311,7 @@ function App(){
         loadingList&&h('div',{className:'empty-note'},'Cargando…'),
         !loadingList&&!entries.length&&h('div',{className:'empty-note'},'Todavía no hay entradas.'),
         !loadingList&&entries.map(entry=>h('div',{key:entry.id,className:'entry-item'},
-          h('div',{className:'meta'},'#'+entry.id),
+          h('div',{className:'meta'},'#'+entry.id+(entry.topic?' · '+entry.topic:'')),
           h('div',{className:'excerpt'},entry.excerpt||(entry.body||'').slice(0,160)),
           h('div',{className:'actions'},
             h('button',{className:'btn-secondary',disabled:busy,onClick:()=>startEdit(entry)},'Editar'),
