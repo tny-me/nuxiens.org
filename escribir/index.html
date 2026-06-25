@@ -112,6 +112,7 @@ function App(){
   const[loadingList,setLoadingList]=useState(true);
   const[editingId,setEditingId]=useState(null);
   const statusRef=useRef(null);
+  const topics=[...new Set(entries.map(e=>e.topic).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
 
   useEffect(()=>{
     if(status&&statusRef.current){
@@ -303,7 +304,8 @@ function App(){
         ),
         h('div',{className:'field'},
           h('label',{},'Tema (opcional)'),
-          h('input',{type:'text',value:topic,placeholder:'ej. fe, escritura, reflexión',onChange:e=>setTopic(e.target.value)}),
+          h('input',{type:'text',list:'topic-options',value:topic,placeholder:'ej. fe, escritura, reflexión',onChange:e=>setTopic(e.target.value)}),
+          h('datalist',{id:'topic-options'},topics.map(t=>h('option',{key:t,value:t}))),
           h('div',{className:'hint'},'Permite filtrar las entradas por tema en el sitio. Déjalo vacío si no aplica.')
         ),
         h('div',{className:'row'},
