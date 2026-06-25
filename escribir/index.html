@@ -215,7 +215,10 @@ function App(){
       if(!getRes.ok)throw new Error('No se pudo leer entries.json ('+getRes.status+')');
       const getData=await getRes.json();
       const current=JSON.parse(b64DecodeUnicode(getData.content.replace(/\n/g,'')));
-      const updated=current.filter(e=>e.id!==entry.id);
+      const updated=current
+        .filter(e=>e.id!==entry.id)
+        .sort((a,b)=>a.id-b.id)
+        .map((e,i)=>({...e,id:i+1}));
       const content=b64EncodeUnicode(JSON.stringify(updated,null,2));
       const putRes=await fetch(API,{
         method:'PUT',
