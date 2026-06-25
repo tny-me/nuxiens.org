@@ -38,6 +38,8 @@ a{color:inherit;text-decoration:none}
 .nx-toggle:hover{color:var(--text);border-color:var(--text3)}
 .nx-hero{max-width:680px;margin:0 auto;padding:28px 20px 8px}
 .nx-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)}
+.nx-topic-title{max-width:680px;margin:6px auto 0;padding:0 20px;text-align:center;font-family:var(--serif);font-weight:500;font-size:32px;text-transform:capitalize;color:var(--text)}
+@media (min-width:880px){.nx-topic-title{max-width:1080px}}
 .nx-topic-toggle{position:fixed;right:0;top:50%;transform:translateY(-50%);background:var(--surface);border:1px solid var(--border);border-right:none;border-radius:10px 0 0 10px;padding:16px 8px;cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--text2);writing-mode:vertical-rl;text-orientation:mixed;z-index:30}
 .nx-topic-toggle:hover{color:var(--accent);border-color:var(--accent)}
 .nx-topic-toggle.active{color:var(--accent);border-color:var(--accent)}
@@ -482,6 +484,7 @@ function App(){
     h('div',{className:'nx-hero'},
       h('div',{className:'nx-eyebrow'},'escritos personales')
     ),
+    activeTopic&&h('div',{className:'nx-topic-title'},activeTopic),
     topics.length>0&&h('button',{
       className:'nx-topic-toggle'+(activeTopic?' active':''),
       onClick:()=>setTopicMenuOpen(!topicMenuOpen)
