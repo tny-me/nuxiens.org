@@ -58,7 +58,7 @@ a.back{display:inline-block;margin-bottom:24px;font-family:var(--mono);font-size
   .card{padding:18px}
   h1{font-size:24px}
   .header-bar{gap:12px}
-  .field textarea[rows="12"]{min-height:50vh}
+  .field textarea[rows="12"]{min-height:35vh}
 }
 </style>
 </head>
@@ -67,7 +67,7 @@ a.back{display:inline-block;margin-bottom:24px;font-family:var(--mono);font-size
 <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
 <script>
-const{useState,useEffect}=React;
+const{useState,useEffect,useRef}=React;
 const h=React.createElement;
 
 const OWNER='tny-me',REPO='nuxiens.org',BRANCH='main',PATH='entries.json';
@@ -111,6 +111,13 @@ function App(){
   const[entries,setEntries]=useState([]);
   const[loadingList,setLoadingList]=useState(true);
   const[editingId,setEditingId]=useState(null);
+  const statusRef=useRef(null);
+
+  useEffect(()=>{
+    if(status&&statusRef.current){
+      statusRef.current.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  },[status]);
 
   useEffect(()=>{
     const saved=localStorage.getItem('nx-gh-token');
@@ -255,7 +262,7 @@ function App(){
         h('div',{className:'sub'},'publica directo en jasachz.com · @jasachz')
       ),
       h('div',{className:'token-wrap'},
-        h('button',{
+        h('button',{type:'button',
           className:'btn-secondary token-btn',
           onClick:()=>setTokenOpen(!tokenOpen)
         },token?'🔑 Conectado':'🔑 Token'),
@@ -274,9 +281,9 @@ function App(){
             })
           ),
           h('div',{className:'row',style:{marginTop:10}},
-            h('button',{className:'btn-secondary',onClick:()=>setShowToken(!showToken)},showToken?'Ocultar':'Ver'),
-            h('button',{className:'btn-secondary',onClick:clearToken},'Borrar'),
-            h('button',{className:'btn-secondary',onClick:()=>setTokenOpen(false)},'Listo')
+            h('button',{type:'button',className:'btn-secondary',onClick:()=>setShowToken(!showToken)},showToken?'Ocultar':'Ver'),
+            h('button',{type:'button',className:'btn-secondary',onClick:clearToken},'Borrar'),
+            h('button',{type:'button',className:'btn-secondary',onClick:()=>setTokenOpen(false)},'Listo')
           )
         )
       )
@@ -287,7 +294,7 @@ function App(){
         h('h2',{},editingId?'Editar entrada #'+editingId:'Nueva lectura'),
         editingId&&h('div',{className:'editing-banner'},
           h('span',{},'Editando la entrada #'+editingId+'.'),
-          h('button',{onClick:resetForm},'Cancelar')
+          h('button',{type:'button',onClick:resetForm},'Cancelar')
         ),
         h('div',{className:'field'},
           h('label',{},'Texto completo'),
@@ -300,10 +307,10 @@ function App(){
           h('div',{className:'hint'},'Permite filtrar las entradas por tema en el sitio. Déjalo vacío si no aplica.')
         ),
         h('div',{className:'row'},
-          h('button',{className:'btn-primary',disabled:busy,onClick:publish},busy?(editingId?'Guardando…':'Publicando…'):(editingId?'Guardar cambios':'Publicar')),
-          editingId&&h('button',{className:'btn-secondary',disabled:busy,onClick:resetForm},'Cancelar')
+          h('button',{type:'button',className:'btn-primary',disabled:busy,onClick:publish},busy?(editingId?'Guardando…':'Publicando…'):(editingId?'Guardar cambios':'Publicar')),
+          editingId&&h('button',{type:'button',className:'btn-secondary',disabled:busy,onClick:resetForm},'Cancelar')
         ),
-        status&&h('div',{className:'status '+status.type},status.msg)
+        status&&h('div',{ref:statusRef,className:'status '+status.type},status.msg)
       ),
 
       h('div',{className:'card'},
@@ -314,8 +321,8 @@ function App(){
           h('div',{className:'meta'},'#'+entry.id+(entry.topic?' · '+entry.topic:'')),
           h('div',{className:'excerpt'},entry.excerpt||(entry.body||'').slice(0,160)),
           h('div',{className:'actions'},
-            h('button',{className:'btn-secondary',disabled:busy,onClick:()=>startEdit(entry)},'Editar'),
-            h('button',{className:'btn-danger',disabled:busy,onClick:()=>removeEntry(entry)},'Borrar')
+            h('button',{type:'button',className:'btn-secondary',disabled:busy,onClick:()=>startEdit(entry)},'Editar'),
+            h('button',{type:'button',className:'btn-danger',disabled:busy,onClick:()=>removeEntry(entry)},'Borrar')
           )
         ))
       )
