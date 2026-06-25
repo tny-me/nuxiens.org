@@ -284,11 +284,6 @@ function App(){
           h('button',{onClick:resetForm},'Cancelar')
         ),
         h('div',{className:'field'},
-          h('label',{},'Fecha de publicación'),
-          h('input',{type:'date',value:dateISO,onChange:e=>setDateISO(e.target.value)}),
-          h('div',{className:'hint'},'Se usa para mostrar la fecha en el sitio y para el código de la imagen (ej. 01:24.06.26).')
-        ),
-        h('div',{className:'field'},
           h('label',{},'Texto completo'),
           h('textarea',{rows:12,value:body,onChange:e=>setBody(e.target.value)}),
           h('div',{className:'hint'},'Separa los párrafos con una línea vacía — cada párrafo se vuelve una imagen del carrusel.')
@@ -305,7 +300,7 @@ function App(){
         loadingList&&h('div',{className:'empty-note'},'Cargando…'),
         !loadingList&&!entries.length&&h('div',{className:'empty-note'},'Todavía no hay entradas.'),
         !loadingList&&entries.map(entry=>h('div',{key:entry.id,className:'entry-item'},
-          h('div',{className:'meta'},'#'+entry.id+' · '+(entry.date||entry.dateISO||'')),
+          h('div',{className:'meta'},'#'+entry.id),
           h('div',{className:'excerpt'},entry.excerpt||(entry.body||'').slice(0,160)),
           h('div',{className:'actions'},
             h('button',{className:'btn-secondary',disabled:busy,onClick:()=>startEdit(entry)},'Editar'),
