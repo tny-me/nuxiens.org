@@ -29,6 +29,9 @@ h1{font-family:var(--serif);font-weight:500;font-size:28px;margin-bottom:6px}
 .field textarea{font-family:var(--serif);font-size:16px;line-height:1.6}
 .hint{font-family:var(--sans);font-size:12px;color:var(--text3);margin-top:6px}
 .row{display:flex;gap:10px;align-items:center}
+.format-toolbar{display:flex;gap:6px;margin-bottom:6px}
+.format-toolbar button{background:var(--bg);border:1px solid var(--border);color:var(--text);width:30px;height:30px;padding:0;border-radius:6px;font-size:13px;display:flex;align-items:center;justify-content:center}
+.format-toolbar button:hover{border-color:var(--accent)}
 .row input{flex:1}
 button{border:none;font-family:var(--sans);font-weight:600;font-size:14px;padding:11px 18px;border-radius:9px;cursor:pointer}
 .btn-primary{background:var(--accent);color:#fff}
@@ -79,6 +82,9 @@ function b64EncodeUnicode(str){
   bytes.forEach(b=>bin+=String.fromCharCode(b));
   return btoa(bin);
 }
+function stripMarkup(text){
+  return (text||'').replace(/\*\*(.+?)\*\*/g,'$1').replace(/\+\+(.+?)\+\+/g,'$1').replace(/\*(.+?)\*/g,'$1');
+}
 function b64DecodeUnicode(str){
   const bin=atob(str);
   const bytes=new Uint8Array(bin.length);
@@ -112,7 +118,22 @@ function App(){
   const[loadingList,setLoadingList]=useState(true);
   const[editingId,setEditingId]=useState(null);
   const statusRef=useRef(null);
+  const bodyRef=useRef(null);
   const topics=[...new Set(entries.map(e=>e.topic).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+
+  const wrapSelection=(before,after)=>{
+    const el=bodyRef.current;
+    if(!el)return;
+    const start=el.selectionStart,end=el.selectionEnd;
+    const selected=body.slice(start,end);
+    const next=body.slice(0,start)+before+selected+after+body.slice(end);
+    setBody(next);
+    requestAnimationFrame(()=>{
+      el.focus();
+      el.selectionStart=start+before.length;
+      el.selectionEnd=start+before.length+selected.length;
+    });
+  };
 
   useEffect(()=>{
     if(status&&statusRef.current){
@@ -299,8 +320,13 @@ function App(){
         ),
         h('div',{className:'field'},
           h('label',{},'Texto completo'),
-          h('textarea',{rows:12,value:body,onChange:e=>setBody(e.target.value)}),
-          h('div',{className:'hint'},'Separa los párrafos con una línea vacía — cada párrafo se vuelve una imagen del carrusel.')
+          h('div',{className:'format-toolbar'},
+            h('button',{type:'button',onClick:()=>wrapSelection('**','**'),title:'Negrita'},h('b',{},'N')),
+            h('button',{type:'button',onClick:()=>wrapSelection('*','*'),title:'Cursiva'},h('i',{},'C')),
+            h('button',{type:'button',onClick:()=>wrapSelection('++','++'),title:'Subrayado'},h('u',{},'S'))
+          ),
+          h('textarea',{ref:bodyRef,rows:12,value:body,onChange:e=>setBody(e.target.value)}),
+          h('div',{className:'hint'},'Separa los párrafos con una línea vacía — cada párrafo se vuelve una imagen del carrusel. Selecciona texto y usa los botones N/C/S para negrita, cursiva o subrayado.')
         ),
         h('div',{className:'field'},
           h('label',{},'Tema (opcional)'),
@@ -321,7 +347,7 @@ function App(){
         !loadingList&&!entries.length&&h('div',{className:'empty-note'},'Todavía no hay entradas.'),
         !loadingList&&entries.map(entry=>h('div',{key:entry.id,className:'entry-item'},
           h('div',{className:'meta'},'#'+entry.id+(entry.topic?' · '+entry.topic:'')),
-          h('div',{className:'excerpt'},entry.excerpt||(entry.body||'').slice(0,160)),
+          h('div',{className:'excerpt'},stripMarkup(entry.excerpt||(entry.body||'').slice(0,160))),
           h('div',{className:'actions'},
             h('button',{type:'button',className:'btn-secondary',disabled:busy,onClick:()=>startEdit(entry)},'Editar'),
             h('button',{type:'button',className:'btn-danger',disabled:busy,onClick:()=>removeEntry(entry)},'Borrar')

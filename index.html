@@ -253,6 +253,25 @@ function entryCode(entry){
   return String(entry.id).padStart(2,'0');
 }
 
+function stripMarkup(text){
+  return (text||'').replace(/\*\*(.+?)\*\*/g,'$1').replace(/\+\+(.+?)\+\+/g,'$1').replace(/\*(.+?)\*/g,'$1');
+}
+
+function parseInline(text){
+  const regex=/\*\*(.+?)\*\*|\+\+(.+?)\+\+|\*(.+?)\*/g;
+  const result=[];
+  let lastIndex=0,m,key=0;
+  while((m=regex.exec(text))){
+    if(m.index>lastIndex)result.push(text.slice(lastIndex,m.index));
+    if(m[1]!==undefined)result.push(h('strong',{key:key++},m[1]));
+    else if(m[2]!==undefined)result.push(h('u',{key:key++},m[2]));
+    else if(m[3]!==undefined)result.push(h('em',{key:key++},m[3]));
+    lastIndex=regex.lastIndex;
+  }
+  if(lastIndex<text.length)result.push(text.slice(lastIndex));
+  return result;
+}
+
 async function renderToBlob(opts){
   const canvas=document.createElement('canvas');
   renderQuoteImage(canvas,opts);
@@ -260,9 +279,9 @@ async function renderToBlob(opts){
 }
 
 function ShareStudio({entry,onClose}){
-  const fragments=useMemo(()=>entry.body.split('\n\n').filter(Boolean),[entry]);
+  const fragments=useMemo(()=>entry.body.split('\n\n').filter(Boolean).map(stripMarkup),[entry]);
   const[mode,setMode]=useState('fragmento');
-  const[quote,setQuote]=useState(entry.quote||entry.excerpt);
+  const[quote,setQuote]=useState(stripMarkup(entry.quote||entry.excerpt));
   const[slide,setSlide]=useState(0);
   const[author,setAuthor]=useState('jasachz');
   const[accent,setAccent]=useState(PALETTE[0]);
@@ -419,7 +438,7 @@ function App(){
   const shareLink=async entry=>{
     setMenuFor(null);
     const url=location.origin+location.pathname+'#e'+entry.id;
-    const text=entry.excerpt||entry.quote||'';
+    const text=stripMarkup(entry.excerpt||entry.quote||'');
     if(navigator.share){
       try{await navigator.share({text,url});}catch(e){}
       return;
@@ -505,7 +524,7 @@ function App(){
         h('div',{className:'nx-entry-num'},entry.id),
         h('div',{className:'nx-entry-body'},
           h('div',{className:'nx-entry-text'},
-            entry.body.split('\n\n').filter(Boolean).map((p,i)=>h('p',{key:i},p))
+            entry.body.split('\n\n').filter(Boolean).map((p,i)=>h('p',{key:i},parseInline(p)))
           ),
           h('div',{className:'nx-entry-actions'},
             h('button',{
